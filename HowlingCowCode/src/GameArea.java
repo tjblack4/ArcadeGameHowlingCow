@@ -5,14 +5,14 @@ import java.util.Random;
 
 public class GameArea extends JPanel implements ActionListener {
 
-    static final int SCREEN_WIDTH = 600; //up for changes
-    static final int SCREEN_HEIGHT = 600; //up for changes
+    static final int SCREEN_WIDTH = 700; //up for changes
+    static final int SCREEN_HEIGHT = 900; //up for changes
     static final int UNIT_SIZE = 25; //size of square, in pixels
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
     static final int DELAY = 100; // > #, slower game
     final int x[] = new int[GAME_UNITS]; //holds x locations of all cartons
     final int y[] = new int[GAME_UNITS]; //holds y locations of all cartons
-    int boardMap[] = {}; //fill in with values
+    int boardMap[][] = new int[36][28]; //fill in with values
     final int FARMER_POSX[] = new int[4]; //holds x locations of all farmers
     final int FARMER_POSY[] = new int[4]; //holds y locations of all farmers
     int myPosx; //holds player x position
@@ -29,6 +29,12 @@ public class GameArea extends JPanel implements ActionListener {
     boolean isPaused = false;
 
     GameArea() {
+        for (int i = 0; i < 36; i++) {
+            for (int j = 0; j < 28; j++) {
+                boardMap[i][j] = 0;
+            }
+        }
+        System.out.println(boardMap[35][27]);
         random = new Random();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -190,7 +196,8 @@ public class GameArea extends JPanel implements ActionListener {
         //g.setColor(Color.green);
         //g.setFont(new Font("Ink Free", Font.BOLD, 75));
         //FontMetrics scoreMetrics = getFontMetrics(g.getFont());
-        //g.drawString("Time: " + (double) (end+start) /1000, (SCREEN_WIDTH - scoreMetrics.stringWidth("Time:" + (end+start)))/2, SCREEN_HEIGHT/2 - 100);
+        //g.drawString("Time: " + (double) (end-|start|) /1000, (SCREEN_WIDTH - scoreMetrics.stringWidth("Time:" + (end+start)))/2, SCREEN_HEIGHT/2 - 100);
+
         //Game Over Text
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD, 75));
