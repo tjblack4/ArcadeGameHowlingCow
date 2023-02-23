@@ -42,6 +42,10 @@ public class GameArea extends JPanel implements ActionListener {
         running = true;
         timer = new Timer(DELAY,this);
         timer.start();
+        for (int j = 0; j<4; j++) {
+            FARMER_POSX[j] = UNIT_SIZE * random.nextInt(SCREEN_WIDTH / UNIT_SIZE);
+            FARMER_POSY[j] = UNIT_SIZE * random.nextInt(SCREEN_HEIGHT / UNIT_SIZE);
+        }
     }
 
     @Override
@@ -59,21 +63,79 @@ public class GameArea extends JPanel implements ActionListener {
                 g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 5; i++) {
                 if (i == 0) {
                     g.setColor(Color.GREEN);
                     g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
                 } else {
+                    g.setColor(Color.red);
+                    g.fillRect(FARMER_POSX[i-1], FARMER_POSY[i-1], UNIT_SIZE, UNIT_SIZE);
+
                     //draw farmer 1,2, or 3
                 }
             }
             //write score code
         }
         else if (isPaused) {
-            
+
         } else {
             gameOver(g);
         }
+    }
+
+    /*
+    Method: moveFarmer1
+    Description of Farmer: Highly Agressive. Takes the shortest possible route to the Cow at all times.
+    When Make Decision on movement: Intersection of maze points
+     */
+    public void moveFarmer1() {
+        //if farmer 1 is @ intersection
+        //do distance formula for all choices
+        //move toward shortest choice
+
+        //otherwise, follow open pathing
+    }
+
+    /*
+    Method: moveFarmer2
+    Description of Farmer: Low Agression. Will only take on the cow when it is far away from powerups
+    When Make Decision on movement: Intersection of maze points
+     */
+    public void moveFarmer2() {
+        //if farmer 2 is @ intersection
+        //do distance formula between cow and powerups
+        //if lower than tolerance, do distance formula for choices
+        //move toward shortest choice
+
+        //otherwise, follow open pathing
+    }
+
+    /*
+    Method: moveFarmer3
+    Description of Farmer: Random. Will make movements randomly based on a couple of factors
+    1. Is the cow close?
+    2. Is the powerup close?
+    3. Are any other ghosts pursuing?
+    When Make Decision on movement: Intersection of maze points
+     */
+    public void moveFarmer3() {
+        //if farmer 3 is @ intersection
+        //check for cow proximity
+        //check for cow's proximity to powerup
+        //check other farmers for pursuit
+        //if all true, do distance formula for all choices
+
+
+        //otherwise, follow open pathing
+    }
+
+    /*
+    Method: moveFarmer4
+    Description of Farmer: Genius Trickster. Will act like is running but will actually be trying to juke the cow
+    When Make Decision on movement: Intersection of maze points
+     */
+    public void moveFarmer4() {
+        //come up with smart farmer method
     }
     public void move() {
         switch (direction) {
@@ -111,26 +173,11 @@ public class GameArea extends JPanel implements ActionListener {
     }
 
     public void checkCollisions() {
-        //write method to check if farmer has hit the cow
-
-        //check if cow has touched left border
-        if (myPosx < 0+2*UNIT_SIZE) {
-            //dont let cow move
-        }
-
-        //check if cow has touched right border
-        if (myPosx > SCREEN_WIDTH-2*UNIT_SIZE) {
-            //dont let cow move
-        }
-
-        //check if cow has touched top border
-        if (myPosY < 0+2*UNIT_SIZE) {
-            //dont let cow move
-        }
-
-        //check if cow has touched bottom border
-        if (myPosY > SCREEN_HEIGHT-2*UNIT_SIZE) {
-            //dont let cow move
+        for (int i = 0; i < 4; i++) {
+            if ((FARMER_POSX[i] == myPosx) && (FARMER_POSY[i] == myPosY)) {
+                running = false;
+                break;
+            }
         }
 
         if (!running) {

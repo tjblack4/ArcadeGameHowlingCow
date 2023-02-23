@@ -4,6 +4,7 @@ public final class Application {
     public static void main(final String args[]) {
         new GameFrame();
 
+
         /*
         System.out.println("Starting...(thread: " + Thread.currentThread() + ")");
         EventQueue.invokeLater(new Runnable() {
