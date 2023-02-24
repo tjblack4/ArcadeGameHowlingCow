@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 public class GameArea extends JPanel implements ActionListener {
@@ -9,7 +13,7 @@ public class GameArea extends JPanel implements ActionListener {
     static final int SCREEN_HEIGHT = 900; //up for changes
     static final int UNIT_SIZE = 25; //size of square, in pixels
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
-    static final int DELAY = 100; // > #, slower game
+    static final int DELAY = 125; // > #, slower game
     final int x[] = new int[GAME_UNITS]; //holds x locations of all cartons
     final int y[] = new int[GAME_UNITS]; //holds y locations of all cartons
     int boardMap[][] = new int[36][28]; //fill in with values
@@ -31,6 +35,7 @@ public class GameArea extends JPanel implements ActionListener {
     GameArea() {
         for (int i = 0; i < 36; i++) {
             for (int j = 0; j < 28; j++) {
+
                 boardMap[i][j] = 0;
             }
         }
@@ -77,7 +82,32 @@ public class GameArea extends JPanel implements ActionListener {
                     g.setColor(Color.red);
                     g.fillRect(FARMER_POSX[i-1], FARMER_POSY[i-1], UNIT_SIZE, UNIT_SIZE);
 
-                    //draw farmer 1,2, or 3
+                    //draw farmer 1,2,3,or 4
+                }
+            }
+
+            for (int row = 0; row < 28; row++) {
+                for (int col = 0; col < 36; col++) {
+                    if (col == 3 || col == 33) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row == 0 || row == 27) && ((col > 3 && col < 13) || (col == 15) || (col == 17) || (col > 19 && col < 33))) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row < 6 || row > 21) && (col == 12 || col == 15 || col == 17 || col == 20)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row == 5 || row == 22) && (col == 13 || col == 14 || col == 18 || col == 19)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 4 && col < 8)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
                 }
             }
             //write score code

@@ -1,7 +1,8 @@
 import java.awt.*;
+import java.io.IOException;
 
 public final class Application {
-    public static void main(final String args[]) {
+    public static void main(final String args[]) throws IOException {
         new GameFrame();
 
 
