@@ -88,10 +88,33 @@ public class GameArea extends JPanel implements ActionListener {
 
             for (int row = 0; row < 28; row++) {
                 for (int col = 0; col < 36; col++) {
-                    if (col == 3 || col == 33) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    if ((col == 3 || col == 33) ||
+                            (row == 0 || row == 27) && ((col > 3 && col < 13) || (col == 15) || (col == 17) || (col > 19 && col < 33)) ||
+                            (row < 6 || row > 21) && (col == 12 || col == 15 || col == 17 || col == 20) ||
+                            (row == 5 || row == 22) && (col == 13 || col == 14 || col == 18 || col == 19) ||
+                            ((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 4 && col < 8) ||
+                            ((row > 6 && row < 12) || (row > 15 && row < 21)) && (col > 4 && col < 8) ||
+                            ((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 8 && col < 11) ||
+                            (row > 12 && row < 15) && (col > 3 && col < 8) ||
+                            ((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 8 && col < 16) ||
+                            ((row > 9 && row < 18) && (col > 8 && col < 11)) ||
+                            ((row > 8 && row < 12) || (row > 15 && row < 19)) && (col > 11 && col < 14) ||
+                            (row > 12 && row < 15) && (col > 8 && col < 14) ||
+                            (row > 9 && row < 18) && (col== 15 || col == 19) ||
+                            (row == 10 || row == 17) && (col > 15 && col < 19) ||
+                            ((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 16 && col < 23) ||
+                            (row > 9 && row < 18)  && (col > 20 && col < 23) ||
+                            (row > 12 && row < 15) && (col > 22 && col < 26) ||
+                            ((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 21 && col < 25) ||
+                            ((row < 4 || (row > 4 && row < 7) || ( row > 20 && row < 23) || row > 23 ) && col == 26) ||
+                            (col == 29  && (row == 13 || row == 14)) ||
+                            (((row > 6 && row < 12) || (row > 15 && row < 21)) && col == 24) ||
+                            (((row > 7 && row < 12) || (row > 15 && row < 20)) && col == 25) ||
+                            (row != 4 && row != 8 && row != 19 && row != 23) && (col == 27 || col == 28) ||
+                            (row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)){
+                        setWall(row, col, g);
                     }
+                    /*
                     if ((row == 0 || row == 27) && ((col > 3 && col < 13) || (col == 15) || (col == 17) || (col > 19 && col < 33))) {
                         g.setColor(Color.BLUE);
                         g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
@@ -108,6 +131,89 @@ public class GameArea extends JPanel implements ActionListener {
                         g.setColor(Color.BLUE);
                         g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
                     }
+                    if (((row > 6 && row < 12) || (row > 15 && row < 21)) && (col > 4 && col < 8)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 8 && col < 11)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row > 12 && row < 15) && (col > 3 && col < 8)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 8 && col < 16)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 9 && row < 18) && (col > 8 && col < 11))) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 8 && row < 12) || (row > 15 && row < 19)) && (col > 11 && col < 14)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row > 12 && row < 15) && (col > 8 && col < 14)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row > 9 && row < 18) && (col== 15 || col == 19))  {
+                        if((row == 13 || row == 14) && col != 19) {
+                            g.setColor(Color.GRAY);
+                        } else
+                            g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row == 10 || row == 17) && (col > 15 && col < 19)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 16 && col < 23)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row > 9 && row < 18)  && (col > 20 && col < 23)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row > 12 && row < 15) && (col > 22 && col < 26)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 21 && col < 25)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row < 4 || (row > 4 && row < 7) || ( row > 20 && row < 23) || row > 23 ) && col == 26) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (col == 29  && (row == 13 || row == 14)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 6 && row < 12) || (row > 15 && row < 21)) && col == 24) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if (((row > 7 && row < 12) || (row > 15 && row < 20)) && col == 25) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+
+                    if ((row != 4 && row != 8 && row != 19 && row != 23) && (col == 27 || col == 28)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    if ((row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)) {
+                        g.setColor(Color.BLUE);
+                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    }
+                    */
+
+
                 }
             }
             //write score code
@@ -119,6 +225,13 @@ public class GameArea extends JPanel implements ActionListener {
         }
     }
 
+    public void setWall(int row, int col, Graphics g) {
+        if((row == 13 || row == 14) && col == 15)
+            g.setColor(Color.GRAY);
+         else
+            g.setColor(Color.BLUE);
+        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+    }
     /*
     Method: moveFarmer1
     Description of Farmer: Highly Agressive. Takes the shortest possible route to the Cow at all times.
