@@ -13,14 +13,14 @@ public class GameArea extends JPanel implements ActionListener {
     static final int SCREEN_HEIGHT = 900; //up for changes
     static final int UNIT_SIZE = 25; //size of square, in pixels
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
-    static final int DELAY = 125; // > #, slower game
+    static final int DELAY = 175; // > #, slower game
     final int x[] = new int[GAME_UNITS]; //holds x locations of all cartons
     final int y[] = new int[GAME_UNITS]; //holds y locations of all cartons
     int boardMap[][] = new int[36][28]; //fill in with values
     final int FARMER_POSX[] = new int[4]; //holds x locations of all farmers
     final int FARMER_POSY[] = new int[4]; //holds y locations of all farmers
-    int myPosx; //holds player x position
-    int myPosY; //holds player y position
+    int myPosx = 13*UNIT_SIZE; //holds player x position
+    int myPosY = 20*UNIT_SIZE; //holds player y position
     int dotsEaten; //holds # of dots eaten, for score calculation
     char farmerDirection[] = new char[4]; // holds directions of each of the farmers
     char direction = 'R'; // holds direction of the cow
@@ -54,8 +54,21 @@ public class GameArea extends JPanel implements ActionListener {
         timer = new Timer(DELAY,this);
         timer.start();
         for (int j = 0; j<4; j++) {
-            FARMER_POSX[j] = UNIT_SIZE * random.nextInt(SCREEN_WIDTH / UNIT_SIZE);
-            FARMER_POSY[j] = UNIT_SIZE * random.nextInt(SCREEN_HEIGHT / UNIT_SIZE);
+            if (j ==1 ) {
+                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE - 2);
+                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+            } else if (j==2) {
+                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE - 2);
+                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 5);
+            } else if (j==3) {
+                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+            } else {
+                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 5);
+            }
+            //FARMER_POSX[j] = UNIT_SIZE * random.nextInt(SCREEN_WIDTH / UNIT_SIZE);
+            //FARMER_POSY[j] = UNIT_SIZE * random.nextInt(SCREEN_HEIGHT / UNIT_SIZE);
         }
     }
 
@@ -113,105 +126,10 @@ public class GameArea extends JPanel implements ActionListener {
                             (row != 4 && row != 8 && row != 19 && row != 23) && (col == 27 || col == 28) ||
                             (row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)){
                         setWall(row, col, g);
-                    }
-                    /*
-                    if ((row == 0 || row == 27) && ((col > 3 && col < 13) || (col == 15) || (col == 17) || (col > 19 && col < 33))) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row < 6 || row > 21) && (col == 12 || col == 15 || col == 17 || col == 20)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row == 5 || row == 22) && (col == 13 || col == 14 || col == 18 || col == 19)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 4 && col < 8)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 6 && row < 12) || (row > 15 && row < 21)) && (col > 4 && col < 8)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 8 && col < 11)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row > 12 && row < 15) && (col > 3 && col < 8)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 8 && col < 16)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 9 && row < 18) && (col > 8 && col < 11))) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 8 && row < 12) || (row > 15 && row < 19)) && (col > 11 && col < 14)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row > 12 && row < 15) && (col > 8 && col < 14)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row > 9 && row < 18) && (col== 15 || col == 19))  {
-                        if((row == 13 || row == 14) && col != 19) {
-                            g.setColor(Color.GRAY);
-                        } else
-                            g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row == 10 || row == 17) && (col > 15 && col < 19)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 6 && row < 9) || (row > 18 && row < 21)) && (col > 16 && col < 23)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row > 9 && row < 18)  && (col > 20 && col < 23)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row > 12 && row < 15) && (col > 22 && col < 26)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 1 && row < 6) || (row > 21 && row < 26)) && (col > 21 && col < 25)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row < 4 || (row > 4 && row < 7) || ( row > 20 && row < 23) || row > 23 ) && col == 26) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (col == 29  && (row == 13 || row == 14)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 6 && row < 12) || (row > 15 && row < 21)) && col == 24) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if (((row > 7 && row < 12) || (row > 15 && row < 20)) && col == 25) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+                    } else {
+                        boardMap[col][row] = 1;
                     }
 
-                    if ((row != 4 && row != 8 && row != 19 && row != 23) && (col == 27 || col == 28)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    if ((row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)) {
-                        g.setColor(Color.BLUE);
-                        g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
-                    }
-                    */
 
 
                 }
@@ -231,6 +149,7 @@ public class GameArea extends JPanel implements ActionListener {
          else
             g.setColor(Color.BLUE);
         g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
+        boardMap[col][row] = 0;
     }
     /*
     Method: moveFarmer1
@@ -289,19 +208,19 @@ public class GameArea extends JPanel implements ActionListener {
     public void move() {
         switch (direction) {
             case 'U':
-                if(myPosY != 0)
+                if((myPosY != 0) && (boardMap[(myPosY-25)/25][myPosx/25] == 1))
                     myPosY = myPosY - UNIT_SIZE;
                 break;
             case 'D':
-                if(myPosY != SCREEN_HEIGHT - 25)
+                if((myPosY != SCREEN_HEIGHT - 25)  && (boardMap[(myPosY+25)/25][myPosx/25] == 1))
                     myPosY = myPosY + UNIT_SIZE;
                 break;
             case 'L':
-                if(myPosx != 0)
+                if((myPosx != 0)  && (boardMap[myPosY/25][(myPosx-25)/25] == 1))
                     myPosx = myPosx - UNIT_SIZE;
                 break;
             case 'R':
-                if(myPosx != SCREEN_WIDTH - 25)
+                if((myPosx != SCREEN_WIDTH - 25)   && (boardMap[myPosY/25][(myPosx+25)/25] == 1))
                     myPosx = myPosx + UNIT_SIZE;
                 break;
 
@@ -377,27 +296,27 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if(direction != 'R') {
+                    if((direction != 'R') && (boardMap[myPosY/25][(myPosx-25)/25] == 1)) {
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if(direction != 'L') {
+                    if((direction != 'L') && (boardMap[myPosY/25][(myPosx+25)/25] == 1)) {
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-                    if(direction != 'D') {
+                    if((direction != 'D') && ((boardMap[(myPosY-25)/25][myPosx/25] == 1))) {
                         direction = 'U';
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if(direction != 'U') {
+                    if((direction != 'U') && (boardMap[(myPosY+25)/25][myPosx/25] == 1)) {
                         direction = 'D';
                     }
                     break;
                 case KeyEvent.VK_1:
-                    if(isPaused == false)
+                    if(!isPaused)
                         pauseGame();
                     else
                         unpauseGame();
