@@ -8,7 +8,8 @@ public final class Application {
 
         /*
         System.out.println("Starting...(thread: " + Thread.currentThread() + ")");
-        EventQueue.invokeLater(new Runnable() {
+        Even
+        tQueue.invokeLater(new Runnable() {
             public void run() {
                 System.out.println("Creating GUI...(thread: " + Thread.currentThread() + ")");
                 new GameFrame();

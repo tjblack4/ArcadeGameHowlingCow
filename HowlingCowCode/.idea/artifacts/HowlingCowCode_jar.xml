@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="HowlingCowCode:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/HowlingCowCode_jar</output-path>
+    <root id="archive" name="HowlingCowCode.jar">
+      <element id="module-output" name="HowlingCowCode" />
+    </root>
+  </artifact>
+</component>

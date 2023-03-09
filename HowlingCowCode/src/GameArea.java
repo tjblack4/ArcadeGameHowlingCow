@@ -9,9 +9,9 @@ import java.util.Random;
 
 public class GameArea extends JPanel implements ActionListener {
 
-    static final int SCREEN_WIDTH = 700; //up for changes
-    static final int SCREEN_HEIGHT = 900; //up for changes
-    static final int UNIT_SIZE = 25; //size of square, in pixels
+    static final int SCREEN_WIDTH = 560; //up for changes (was 700 OG)
+    static final int SCREEN_HEIGHT = 720; //up for changes (was 900 OG)
+    static final int UNIT_SIZE = 20; //size of square, in pixels (was 25 OG)
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
     static final int DELAY = 175; // > #, slower game
     final int x[] = new int[GAME_UNITS]; //holds x locations of all cartons
@@ -31,6 +31,7 @@ public class GameArea extends JPanel implements ActionListener {
     long pauseEnding;
     long start;
     boolean isPaused = false;
+    boolean isTeleporting = false;
 
     GameArea() {
         for (int i = 0; i < 36; i++) {
@@ -39,7 +40,6 @@ public class GameArea extends JPanel implements ActionListener {
                 boardMap[i][j] = 0;
             }
         }
-        System.out.println(boardMap[35][27]);
         random = new Random();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -54,22 +54,21 @@ public class GameArea extends JPanel implements ActionListener {
         timer = new Timer(DELAY,this);
         timer.start();
         for (int j = 0; j<4; j++) {
-            if (j ==1 ) {
-                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE - 2);
-                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+            if (j ==0 ) {
+                FARMER_POSX[j] = UNIT_SIZE * 11;
+                FARMER_POSY[j] = UNIT_SIZE * 16;
+            } else if (j==1) {
+                FARMER_POSX[j] = UNIT_SIZE * 16;
+                FARMER_POSY[j] = UNIT_SIZE * 16;
             } else if (j==2) {
-                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE - 2);
-                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 5);
-            } else if (j==3) {
-                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
-                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
+                FARMER_POSX[j] = UNIT_SIZE * 11;
+                FARMER_POSY[j] = UNIT_SIZE * 18;
             } else {
-                FARMER_POSX[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 3);
-                FARMER_POSY[j] = UNIT_SIZE * (myPosx/UNIT_SIZE + 5);
+                FARMER_POSX[j] = UNIT_SIZE * 16;
+                FARMER_POSY[j] = UNIT_SIZE * 18;
             }
-            //FARMER_POSX[j] = UNIT_SIZE * random.nextInt(SCREEN_WIDTH / UNIT_SIZE);
-            //FARMER_POSY[j] = UNIT_SIZE * random.nextInt(SCREEN_HEIGHT / UNIT_SIZE);
         }
+
     }
 
     @Override
@@ -129,9 +128,6 @@ public class GameArea extends JPanel implements ActionListener {
                     } else {
                         boardMap[col][row] = 1;
                     }
-
-
-
                 }
             }
             //write score code
@@ -142,6 +138,28 @@ public class GameArea extends JPanel implements ActionListener {
             gameOver(g);
         }
     }
+    /*
+    public boolean checkIntersection(int row, int col) {
+        //System.out.println(row);
+        //System.out.println(col);
+        if ((col == 4) && (row == 6 || row == 21) ||
+                (col == 8 && (row == 1 || row == 6 || row == 9 || row == 12 || row == 15 || row == 18 || row == 21 || row == 26)) ||
+                (col == 11 && (row == 6 || row == 21)) ||
+                (col == 14 && (row == 12 || row == 15)) ||
+                (col == 16 && (row == 6 || row == 9 || row == 18 || row == 21)) ||
+                (col == 20 && (row == 9 || row == 18)) ||
+                (col == 21 && (row == 6 || row == 21)) ||
+                (col == 23 && (row == 6 || row == 9 || row == 18 || row == 21)) ||
+                (col == 25 && (row == 4 || row == 6 || row == 21 || row == 23)) ||
+                (col == 26 && (row == 8 || row == 12 || row == 15 || row == 19)) ||
+                (col == 29 && (row == 4 || row == 8 || row == 19 || row == 23)) ||
+                (col == 32 && (row == 12 || row == 15))) {
+            System.out.println("True!");
+            return true;
+        }
+        return false;
+    }
+    */
 
     public void setWall(int row, int col, Graphics g) {
         if((row == 13 || row == 14) && col == 15)
@@ -157,6 +175,13 @@ public class GameArea extends JPanel implements ActionListener {
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer1() {
+        System.out.println("My pos:" + myPosx/25 + " , " + myPosY/25);
+        System.out.println("Farmer pos:" + FARMER_POSX[0]/25 + " , " +  FARMER_POSY[0]/25);
+
+        //if(checkIntersection(FARMER_POSX[0]/25, FARMER_POSY[0]/25)) {
+            double dist = Math.sqrt((Math.pow(myPosx-FARMER_POSX[0],2))+Math.pow(myPosY-FARMER_POSY[0],2));
+            System.out.println("Distance @ Intersection: " + dist);
+        //}
         //if farmer 1 is @ intersection
         //do distance formula for all choices
         //move toward shortest choice
@@ -208,25 +233,53 @@ public class GameArea extends JPanel implements ActionListener {
     public void move() {
         switch (direction) {
             case 'U':
-                if((myPosY != 0) && (boardMap[(myPosY-25)/25][myPosx/25] == 1))
+                if((myPosY != 0) && (boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0))
                     myPosY = myPosY - UNIT_SIZE;
                 break;
             case 'D':
-                if((myPosY != SCREEN_HEIGHT - 25)  && (boardMap[(myPosY+25)/25][myPosx/25] == 1))
+                if((myPosY != SCREEN_HEIGHT - UNIT_SIZE)  && (boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0))
                     myPosY = myPosY + UNIT_SIZE;
                 break;
             case 'L':
-                if((myPosx != 0)  && (boardMap[myPosY/25][(myPosx-25)/25] == 1))
+                if(((myPosx - UNIT_SIZE) / UNIT_SIZE == 3) && (myPosY/UNIT_SIZE == 16) || isTeleporting)
+                    teleport(direction);
+                if((myPosx != 0)  && (boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0))
                     myPosx = myPosx - UNIT_SIZE;
                 break;
             case 'R':
-                if((myPosx != SCREEN_WIDTH - 25)   && (boardMap[myPosY/25][(myPosx+25)/25] == 1))
+                if (((myPosx + UNIT_SIZE) / UNIT_SIZE == 25) && (myPosY/UNIT_SIZE == 16) || isTeleporting)
+                    teleport(direction);
+                if((myPosx != SCREEN_WIDTH - UNIT_SIZE)   && (boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0))
                     myPosx = myPosx + UNIT_SIZE;
                 break;
 
         }
     }
 
+    public void teleport(char direction) {
+        if (direction == 'L') {
+            if (myPosx/UNIT_SIZE != 25) {
+                isTeleporting = true;
+            } else {
+                isTeleporting = false;
+            }
+            myPosx = myPosx - UNIT_SIZE;
+            if (myPosx-UNIT_SIZE == 0) {
+                myPosx = SCREEN_WIDTH;
+            }
+        } else {
+            if (myPosx/UNIT_SIZE != 3) {
+                isTeleporting = true;
+            } else {
+                isTeleporting = false;
+            }
+            myPosx = myPosx + UNIT_SIZE;
+            if (myPosx+UNIT_SIZE == SCREEN_WIDTH) {
+                myPosx = 0;
+            }
+
+        }
+    }
     public void checkCarton() {
         /*
         for (int i=0; i<=x.length; i++) {
@@ -285,6 +338,10 @@ public class GameArea extends JPanel implements ActionListener {
 
         if (running) {
             move();
+            moveFarmer1();
+            moveFarmer2();
+            moveFarmer3();
+            moveFarmer4();
             checkCarton();
             checkCollisions();
         }
@@ -296,22 +353,22 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if((direction != 'R') && (boardMap[myPosY/25][(myPosx-25)/25] == 1)) {
+                    if((direction != 'R') && (boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] == 1)) {
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if((direction != 'L') && (boardMap[myPosY/25][(myPosx+25)/25] == 1)) {
+                    if((direction != 'L') && (boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] == 1)) {
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-                    if((direction != 'D') && ((boardMap[(myPosY-25)/25][myPosx/25] == 1))) {
+                    if((direction != 'D') && ((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1))) {
                         direction = 'U';
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if((direction != 'U') && (boardMap[(myPosY+25)/25][myPosx/25] == 1)) {
+                    if((direction != 'U') && (boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
                         direction = 'D';
                     }
                     break;
