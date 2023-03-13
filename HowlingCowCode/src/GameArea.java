@@ -32,6 +32,7 @@ public class GameArea extends JPanel implements ActionListener {
     long start;
     boolean isPaused = false;
     boolean isTeleporting = false;
+    public boolean[] farmersInCage = {false, false, false, false};
 
     GameArea() {
         for (int i = 0; i < 36; i++) {
@@ -138,7 +139,7 @@ public class GameArea extends JPanel implements ActionListener {
             gameOver(g);
         }
     }
-    /*
+
     public boolean checkIntersection(int row, int col) {
         //System.out.println(row);
         //System.out.println(col);
@@ -154,12 +155,12 @@ public class GameArea extends JPanel implements ActionListener {
                 (col == 26 && (row == 8 || row == 12 || row == 15 || row == 19)) ||
                 (col == 29 && (row == 4 || row == 8 || row == 19 || row == 23)) ||
                 (col == 32 && (row == 12 || row == 15))) {
-            System.out.println("True!");
+            //System.out.println("True!");
             return true;
         }
         return false;
     }
-    */
+
 
     public void setWall(int row, int col, Graphics g) {
         if((row == 13 || row == 14) && col == 15)
@@ -169,19 +170,68 @@ public class GameArea extends JPanel implements ActionListener {
         g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         boardMap[col][row] = 0;
     }
+    public void leaveCage(int farmerNum) {
+        if (farmerNum == 1) {
+            FARMER_POSX[0] += UNIT_SIZE*2;
+            FARMER_POSY[0] -= UNIT_SIZE*2;
+            farmerDirection[0] = 'R';
+            farmersInCage[0] = true;
+        } else if (farmerNum == 2) {
+            FARMER_POSX[1] -= UNIT_SIZE*2;
+            FARMER_POSY[1] -= UNIT_SIZE*2;
+            farmerDirection[1] = 'R';
+            farmersInCage[1] = true;
+        } else if (farmerNum == 3) {
+            FARMER_POSX[2] += UNIT_SIZE*2;
+            FARMER_POSY[2] -= UNIT_SIZE*4;
+            farmerDirection[2] = 'R';
+            farmersInCage[2] = true;
+        } else {
+            FARMER_POSX[3] -= UNIT_SIZE*3;
+            FARMER_POSY[3] -= UNIT_SIZE*4;
+            farmerDirection[3] = 'R';
+            farmersInCage[3] = true;
+        }
+    }
     /*
     Method: moveFarmer1
     Description of Farmer: Highly Agressive. Takes the shortest possible route to the Cow at all times.
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer1() {
-        System.out.println("My pos:" + myPosx/25 + " , " + myPosY/25);
-        System.out.println("Farmer pos:" + FARMER_POSX[0]/25 + " , " +  FARMER_POSY[0]/25);
 
-        //if(checkIntersection(FARMER_POSX[0]/25, FARMER_POSY[0]/25)) {
+        if (!farmersInCage[0]) {
+            leaveCage(1);
+        }
+        //FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
+        if (!checkIntersection(FARMER_POSX[0]/UNIT_SIZE, FARMER_POSY[0]/UNIT_SIZE)) {
+            switch (farmerDirection[0]) {
+                case 'U':
+                    FARMER_POSY[0] = FARMER_POSY[0] - UNIT_SIZE;
+                    break;
+                case 'D':
+                    FARMER_POSY[0] = FARMER_POSY[0] + UNIT_SIZE;
+                    break;
+                case 'L':
+                    FARMER_POSX[0] = FARMER_POSX[0] - UNIT_SIZE;
+                    break;
+                case 'R':
+                    FARMER_POSX[0] = FARMER_POSX[0] + UNIT_SIZE;
+                    break;
+            }
+        } else {
+            System.out.println("At Intersection");
+            if (FARMER_POSX[0] - UNIT_SIZE !)
+        }
+
+
+        //System.out.println("My pos:" + myPosx/25 + " , " + myPosY/25);
+        //System.out.println("Farmer pos:" + FARMER_POSX[0]/25 + " , " +  FARMER_POSY[0]/25);
+
+        if(checkIntersection(FARMER_POSX[0]/25, FARMER_POSY[0]/25)) {
             double dist = Math.sqrt((Math.pow(myPosx-FARMER_POSX[0],2))+Math.pow(myPosY-FARMER_POSY[0],2));
             System.out.println("Distance @ Intersection: " + dist);
-        //}
+        }
         //if farmer 1 is @ intersection
         //do distance formula for all choices
         //move toward shortest choice
@@ -195,6 +245,13 @@ public class GameArea extends JPanel implements ActionListener {
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer2() {
+        /*
+        if (!farmersInCage[1]) {
+            leaveCage(2);
+        }
+        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
+        */
+
         //if farmer 2 is @ intersection
         //do distance formula between cow and powerups
         //if lower than tolerance, do distance formula for choices
@@ -212,6 +269,12 @@ public class GameArea extends JPanel implements ActionListener {
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer3() {
+        /*
+        if (!farmersInCage[2]) {
+            leaveCage(3);
+        }
+        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
+         */
         //if farmer 3 is @ intersection
         //check for cow proximity
         //check for cow's proximity to powerup
@@ -228,6 +291,12 @@ public class GameArea extends JPanel implements ActionListener {
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer4() {
+        /*
+        if (!farmersInCage[3]) {
+            leaveCage(4);
+        }
+        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
+         */
         //come up with smart farmer method
     }
     public void move() {
