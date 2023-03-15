@@ -26,10 +26,9 @@ public class GameArea extends JPanel implements ActionListener {
     char direction = 'R'; // holds direction of the cow
     boolean running = false; // holds value for if game is running
     Timer timer;
-    Random random;
     long pauseBeginning;
     long pauseEnding;
-    long start;
+    public long start;
     boolean isPaused = false;
     boolean isTeleporting = false;
     public boolean[] farmersInCage = {false, false, false, false};
@@ -41,7 +40,6 @@ public class GameArea extends JPanel implements ActionListener {
                 boardMap[i][j] = 0;
             }
         }
-        random = new Random();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setFocusable(true);
@@ -78,6 +76,10 @@ public class GameArea extends JPanel implements ActionListener {
         draw(g);
     }
 
+    /*
+    Method: draw
+    @param g Holds graphical information
+     */
     public void draw(Graphics g) {
 
         if (running) {
@@ -87,18 +89,33 @@ public class GameArea extends JPanel implements ActionListener {
                 g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
 
+            //sets color of each farmer and cow
             for (int i = 0; i < 5; i++) {
-                if (i == 0) {
-                    g.setColor(Color.GREEN);
-                    g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
-                } else {
-                    g.setColor(Color.red);
-                    g.fillRect(FARMER_POSX[i-1], FARMER_POSY[i-1], UNIT_SIZE, UNIT_SIZE);
-
-                    //draw farmer 1,2,3,or 4
+                switch (i) {
+                    case 0:
+                        g.setColor(Color.GREEN);
+                        g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 1:
+                        g.setColor(Color.RED);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 2:
+                        g.setColor(Color.CYAN);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 3:
+                        g.setColor(Color.ORANGE);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 4:
+                        g.setColor(Color.PINK);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
                 }
             }
 
+            //Wall is drawn on board
             for (int row = 0; row < 28; row++) {
                 for (int col = 0; col < 36; col++) {
                     if ((col == 3 || col == 33) ||
@@ -127,22 +144,25 @@ public class GameArea extends JPanel implements ActionListener {
                             (row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)){
                         setWall(row, col, g);
                     } else {
-                        boardMap[col][row] = 1;
+                        boardMap[col][row] = 1; //if not wall, 2d array is set to be 1
                     }
                 }
             }
-            //write score code
         }
         else if (isPaused) {
-
+            //make pause screen code
         } else {
-            gameOver(g);
+            gameOver(g); //if not paused or running, game is over
         }
     }
 
+    /*
+    Method: checkIntersection
+    @param row Holds value of "big pixel width" currently being checked
+    @param col Holds value of "big pixel height" currently being checked
+    Purpose: If at intersection, returns true
+     */
     public boolean checkIntersection(int row, int col) {
-        //System.out.println(row);
-        //System.out.println(col);
         if ((col == 4) && (row == 6 || row == 21) ||
                 (col == 8 && (row == 1 || row == 6 || row == 9 || row == 12 || row == 15 || row == 18 || row == 21 || row == 26)) ||
                 (col == 11 && (row == 6 || row == 21)) ||
@@ -155,21 +175,32 @@ public class GameArea extends JPanel implements ActionListener {
                 (col == 26 && (row == 8 || row == 12 || row == 15 || row == 19)) ||
                 (col == 29 && (row == 4 || row == 8 || row == 19 || row == 23)) ||
                 (col == 32 && (row == 12 || row == 15))) {
-            //System.out.println("True!");
             return true;
         }
         return false;
     }
 
-
+    /*
+    Method: setWall
+    @param row Holds value of "big pixel width" currently being checked
+    @param col Holds value of "big pixel height" currently being checked
+    @param g Holds graphics information
+    Purpose: Sets boardMap 2D array to be value 0 if wall
+     */
     public void setWall(int row, int col, Graphics g) {
         if((row == 13 || row == 14) && col == 15)
             g.setColor(Color.GRAY);
-         else
+        else
             g.setColor(Color.BLUE);
         g.fillRect(row * UNIT_SIZE, col * UNIT_SIZE, UNIT_SIZE, UNIT_SIZE);
         boardMap[col][row] = 0;
     }
+
+    /*
+    Method: leaveCage
+    @param farmerNum holds which farmer is leaving the cage
+    Purpose: Allows each farmer to leave the cage
+     */
     public void leaveCage(int farmerNum) {
         if (farmerNum == 1) {
             FARMER_POSX[0] += UNIT_SIZE*2;
@@ -177,7 +208,7 @@ public class GameArea extends JPanel implements ActionListener {
             farmerDirection[0] = 'R';
             farmersInCage[0] = true;
         } else if (farmerNum == 2) {
-            FARMER_POSX[1] -= UNIT_SIZE*2;
+            FARMER_POSX[1] -= UNIT_SIZE*3;
             FARMER_POSY[1] -= UNIT_SIZE*2;
             farmerDirection[1] = 'R';
             farmersInCage[1] = true;
@@ -193,6 +224,30 @@ public class GameArea extends JPanel implements ActionListener {
             farmersInCage[3] = true;
         }
     }
+
+    /*
+    Method: checkNextDirection
+    @param direction Holds the direction of the specific farmer that which the method was called for
+    @param index Holds the index of the value that the farmer's information is stored in
+    @return char
+    Purpose: Will check the next direction that the farmer should be facing
+     */
+    public char checkNextDirection(char direction, int index) {
+        if ((boardMap[FARMER_POSY[index]/UNIT_SIZE][FARMER_POSX[index]/UNIT_SIZE - 1] != 0) && (direction != 'R')) {
+            return 'L';
+        }
+        if (boardMap[FARMER_POSY[index]/UNIT_SIZE][FARMER_POSX[index]/UNIT_SIZE + 1] != 0 && direction != 'L') {
+            return 'R';
+        }
+        if (boardMap[FARMER_POSY[index]/UNIT_SIZE - 1][FARMER_POSX[index]/UNIT_SIZE] != 0 && direction != 'D') {
+            return 'U';
+        }
+        if (boardMap[FARMER_POSY[index]/UNIT_SIZE + 1][FARMER_POSX[index]/UNIT_SIZE] != 0 && direction != 'U') {
+            return 'D';
+        }
+        return 0;
+    }
+
     /*
     Method: moveFarmer1
     Description of Farmer: Highly Agressive. Takes the shortest possible route to the Cow at all times.
@@ -200,105 +255,458 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer1() {
 
-        if (!farmersInCage[0]) {
+        if (!farmersInCage[0] && System.currentTimeMillis() - start > 2000) {
             leaveCage(1);
         }
-        //FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
+
         if (!checkIntersection(FARMER_POSX[0]/UNIT_SIZE, FARMER_POSY[0]/UNIT_SIZE)) {
             switch (farmerDirection[0]) {
                 case 'U':
-                    FARMER_POSY[0] = FARMER_POSY[0] - UNIT_SIZE;
+                    if((boardMap[(FARMER_POSY[0] - UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE] != 0))
+                        FARMER_POSY[0] = FARMER_POSY[0] - UNIT_SIZE;
+                    else
+                        farmerDirection[0] = checkNextDirection(farmerDirection[0], 0);
                     break;
                 case 'D':
-                    FARMER_POSY[0] = FARMER_POSY[0] + UNIT_SIZE;
+                    if((boardMap[(FARMER_POSY[0] + UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE] != 0))
+                        FARMER_POSY[0] = FARMER_POSY[0] + UNIT_SIZE;
+                    else
+                        farmerDirection[0] = checkNextDirection(farmerDirection[0], 0);
                     break;
                 case 'L':
-                    FARMER_POSX[0] = FARMER_POSX[0] - UNIT_SIZE;
+                    if((boardMap[FARMER_POSY[0]/UNIT_SIZE][(FARMER_POSX[0] - UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[0] = FARMER_POSX[0] - UNIT_SIZE;
+                    else
+                        farmerDirection[0] = checkNextDirection(farmerDirection[0], 0);
                     break;
                 case 'R':
-                    FARMER_POSX[0] = FARMER_POSX[0] + UNIT_SIZE;
+                    if((boardMap[FARMER_POSY[0]/UNIT_SIZE][(FARMER_POSX[0] + UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[0] = FARMER_POSX[0] + UNIT_SIZE;
+                    else
+                        farmerDirection[0] = checkNextDirection(farmerDirection[0], 0);
                     break;
             }
         } else {
-            System.out.println("At Intersection");
-            if (FARMER_POSX[0] - UNIT_SIZE !)
+            double dist[] = new double[4];
+            double smallestNum = 5000;
+            int smallestNumIndex = 0;
+
+            if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE - 1] != 0 && farmerDirection[0] != 'R' && (FARMER_POSX[0]/UNIT_SIZE != 6 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
+                dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] - 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
+            } else {
+                dist[0] = -1;
+            }
+            if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE + 1] != 0 && farmerDirection[0] != 'L' && (FARMER_POSX[0]/UNIT_SIZE != 21 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
+                dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] + 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
+            } else {
+                dist[1] = -1;
+            }
+            if (boardMap[FARMER_POSY[0]/UNIT_SIZE - 1][FARMER_POSX[0]/UNIT_SIZE] != 0 && farmerDirection[0] != 'D') {
+                dist[2] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[0],2))+Math.pow(myPosY-(FARMER_POSY[0] - 1),2));
+            } else {
+                dist[2] = -1;
+            }
+            if (boardMap[FARMER_POSY[0]/UNIT_SIZE + 1][FARMER_POSX[0]/UNIT_SIZE] != 0&& farmerDirection[0] != 'U') {
+                dist[3] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[0],2))+Math.pow(myPosY-(FARMER_POSY[0] + 1),2));
+            } else {
+                dist[3] = -1;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                if ((dist[i] < smallestNum) && (dist[i] != -1)) {
+                    smallestNum = dist[i];
+                    smallestNumIndex = i;
+                }
+            }
+
+            if (smallestNumIndex == 0) {
+                farmerDirection[0] = 'L';
+                FARMER_POSX[0] -= UNIT_SIZE;
+            } else if (smallestNumIndex == 1) {
+                farmerDirection[0] = 'R';
+                FARMER_POSX[0] += UNIT_SIZE;
+            } else if (smallestNumIndex == 2) {
+                farmerDirection[0] = 'U';
+                FARMER_POSY[0] -= UNIT_SIZE;
+            }
+            if (smallestNumIndex == 3) {
+                farmerDirection[0] = 'D';
+                FARMER_POSY[0] += UNIT_SIZE;
+            }
         }
-
-
-        //System.out.println("My pos:" + myPosx/25 + " , " + myPosY/25);
-        //System.out.println("Farmer pos:" + FARMER_POSX[0]/25 + " , " +  FARMER_POSY[0]/25);
-
-        if(checkIntersection(FARMER_POSX[0]/25, FARMER_POSY[0]/25)) {
-            double dist = Math.sqrt((Math.pow(myPosx-FARMER_POSX[0],2))+Math.pow(myPosY-FARMER_POSY[0],2));
-            System.out.println("Distance @ Intersection: " + dist);
-        }
-        //if farmer 1 is @ intersection
-        //do distance formula for all choices
-        //move toward shortest choice
-
-        //otherwise, follow open pathing
     }
 
     /*
     Method: moveFarmer2
-    Description of Farmer: Low Agression. Will only take on the cow when it is far away from powerups
+    Description of Farmer: The farmer will avoid the cow at all costs!
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer2() {
-        /*
-        if (!farmersInCage[1]) {
+
+        if (!farmersInCage[1] && System.currentTimeMillis() - start > 1500) {
             leaveCage(2);
         }
-        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
-        */
 
-        //if farmer 2 is @ intersection
-        //do distance formula between cow and powerups
-        //if lower than tolerance, do distance formula for choices
-        //move toward shortest choice
+        if (!checkIntersection(FARMER_POSX[1]/UNIT_SIZE, FARMER_POSY[1]/UNIT_SIZE)) {
+            switch (farmerDirection[1]) {
+                case 'U':
+                    if((boardMap[(FARMER_POSY[1] - UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE] != 0))
+                        FARMER_POSY[1] = FARMER_POSY[1] - UNIT_SIZE;
+                    else
+                        farmerDirection[1] = checkNextDirection(farmerDirection[1], 1);
+                    break;
+                case 'D':
+                    if((boardMap[(FARMER_POSY[1] + UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE] != 0))
+                        FARMER_POSY[1] = FARMER_POSY[1] + UNIT_SIZE;
+                    else
+                        farmerDirection[1] = checkNextDirection(farmerDirection[1], 1);
+                    break;
+                case 'L':
+                    if((boardMap[FARMER_POSY[1]/UNIT_SIZE][(FARMER_POSX[1] - UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[1] = FARMER_POSX[1] - UNIT_SIZE;
+                    else
+                        farmerDirection[1] = checkNextDirection(farmerDirection[1], 1);
+                    break;
+                case 'R':
+                    if((boardMap[FARMER_POSY[1]/UNIT_SIZE][(FARMER_POSX[1] + UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[1] = FARMER_POSX[1] + UNIT_SIZE;
+                    else
+                        farmerDirection[1] = checkNextDirection(farmerDirection[1], 1);
+                    break;
+            }
+        } else {
+            double dist[] = new double[4];
+            double largestNum = 0;
+            int largestNumIndex = -1;
 
-        //otherwise, follow open pathing
+
+            if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE - 1] != 0 && farmerDirection[1] != 'R' && (FARMER_POSX[1]/UNIT_SIZE != 6 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
+                dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[1] - 1),2))+Math.pow(myPosY-FARMER_POSY[1],2));
+            } else {
+                dist[0] = -1;
+            }
+            if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE + 1] != 0 && farmerDirection[1] != 'L' && (FARMER_POSX[1]/UNIT_SIZE != 21 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
+                dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[1] + 1),2))+Math.pow(myPosY-FARMER_POSY[1],2));
+            } else {
+                dist[1] = -1;
+            }
+            if (boardMap[FARMER_POSY[1]/UNIT_SIZE - 1][FARMER_POSX[1]/UNIT_SIZE] != 0 && farmerDirection[1] != 'D') {
+                dist[2] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[1],2))+Math.pow(myPosY-(FARMER_POSY[1] - 1),2));
+            } else {
+                dist[2] = -1;
+            }
+            if (boardMap[FARMER_POSY[1]/UNIT_SIZE + 1][FARMER_POSX[1]/UNIT_SIZE] != 0&& farmerDirection[1] != 'U') {
+                dist[3] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[1],2))+Math.pow(myPosY-(FARMER_POSY[1] + 1),2));
+            } else {
+                dist[3] = -1;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                if ((dist[i] > largestNum) && (dist[i] != -1)) {
+                    largestNum = dist[i];
+                    largestNumIndex = i;
+                }
+            }
+
+            if (largestNumIndex == 0) {
+                farmerDirection[1] = 'L';
+                FARMER_POSX[1] -= UNIT_SIZE;
+            } else if (largestNumIndex == 1) {
+                farmerDirection[1] = 'R';
+                FARMER_POSX[1] += UNIT_SIZE;
+            } else if (largestNumIndex == 2) {
+                farmerDirection[1] = 'U';
+                FARMER_POSY[1] -= UNIT_SIZE;
+            }
+            if (largestNumIndex == 3) {
+                farmerDirection[1] = 'D';
+                FARMER_POSY[1] += UNIT_SIZE;
+            }
+
+
+        }
     }
-
     /*
     Method: moveFarmer3
-    Description of Farmer: Random. Will make movements randomly based on a couple of factors
-    1. Is the cow close?
-    2. Is the powerup close?
-    3. Are any other ghosts pursuing?
+    Description of Farmer: If cow within 8 blocks (160 px) then pursue, otherwise make way to bottom right
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer3() {
-        /*
-        if (!farmersInCage[2]) {
+
+        if (!farmersInCage[2] && System.currentTimeMillis() - start > 2500) {
             leaveCage(3);
         }
-        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
-         */
-        //if farmer 3 is @ intersection
-        //check for cow proximity
-        //check for cow's proximity to powerup
-        //check other farmers for pursuit
-        //if all true, do distance formula for all choices
+
+        if (!checkIntersection(FARMER_POSX[2]/UNIT_SIZE, FARMER_POSY[2]/UNIT_SIZE)) {
+            switch (farmerDirection[2]) {
+                case 'U':
+                    if((boardMap[(FARMER_POSY[2] - UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE] != 0))
+                        FARMER_POSY[2] = FARMER_POSY[2] - UNIT_SIZE;
+                    else
+                        farmerDirection[2] = checkNextDirection(farmerDirection[2], 2);
+                    break;
+                case 'D':
+                    if((boardMap[(FARMER_POSY[2] + UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE] != 0))
+                        FARMER_POSY[2] = FARMER_POSY[2] + UNIT_SIZE;
+                    else
+                        farmerDirection[2] = checkNextDirection(farmerDirection[2], 2);
+                    break;
+                case 'L':
+                    if((boardMap[FARMER_POSY[2]/UNIT_SIZE][(FARMER_POSX[2] - UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[2] = FARMER_POSX[2] - UNIT_SIZE;
+                    else
+                        farmerDirection[2] = checkNextDirection(farmerDirection[2], 2);
+                    break;
+                case 'R':
+                    if((boardMap[FARMER_POSY[2]/UNIT_SIZE][(FARMER_POSX[2] + UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[2] = FARMER_POSX[2] + UNIT_SIZE;
+                    else
+                        farmerDirection[2] = checkNextDirection(farmerDirection[2], 2);
+                    break;
+            }
+        } else {
+            if (Math.sqrt((Math.pow(myPosx-FARMER_POSX[2],2))+Math.pow(myPosY-FARMER_POSY[2],2)) < 160) {
+                double dist[] = new double[4];
+                double smallestNum = 5000;
+                int smallestNumIndex = -1;
 
 
-        //otherwise, follow open pathing
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE - 1] != 0 && farmerDirection[2] != 'R' && (FARMER_POSX[2]/UNIT_SIZE != 6 && FARMER_POSY[2]/UNIT_SIZE != 16)) {
+                    dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[2] - 1),2))+Math.pow(myPosY-FARMER_POSY[2],2));
+                } else {
+                    dist[0] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE + 1] != 0 && farmerDirection[2] != 'L' && (FARMER_POSX[2]/UNIT_SIZE != 21 && FARMER_POSY[2]/UNIT_SIZE != 16)) {
+                    dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[2] + 1),2))+Math.pow(myPosY-FARMER_POSY[2],2));
+                } else {
+                    dist[1] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE - 1][FARMER_POSX[2]/UNIT_SIZE] != 0 && farmerDirection[2] != 'D') {
+                    dist[2] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[2],2))+Math.pow(myPosY-(FARMER_POSY[2] - 1),2));
+                } else {
+                    dist[2] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE + 1][FARMER_POSX[2]/UNIT_SIZE] != 0&& farmerDirection[2] != 'U') {
+                    dist[3] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[2],2))+Math.pow(myPosY-(FARMER_POSY[2] + 1),2));
+                } else {
+                    dist[3] = -1;
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    if ((dist[i] < smallestNum) && (dist[i] != -1)) {
+                        smallestNum = dist[i];
+                        smallestNumIndex = i;
+                    }
+                }
+
+                if (smallestNumIndex == 0) {
+                    farmerDirection[2] = 'L';
+                    FARMER_POSX[2] -= UNIT_SIZE;
+                } else if (smallestNumIndex == 1) {
+                    farmerDirection[2] = 'R';
+                    FARMER_POSX[2] += UNIT_SIZE;
+                } else if (smallestNumIndex == 2) {
+                    farmerDirection[2] = 'U';
+                    FARMER_POSY[2] -= UNIT_SIZE;
+                }
+                if (smallestNumIndex == 3) {
+                    farmerDirection[2] = 'D';
+                    FARMER_POSY[2] += UNIT_SIZE;
+                }
+            } else {
+                double dist[] = new double[4];
+                double smallestNum = 5000;
+                int smallestNumIndex = -1;
+
+
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE - 1] != 0 && farmerDirection[2] != 'R' && (FARMER_POSX[2]/UNIT_SIZE != 6 && FARMER_POSY[2]/UNIT_SIZE != 16)) {
+                    dist[0] = Math.sqrt((Math.pow(SCREEN_WIDTH-(FARMER_POSX[2] - 1),2))+Math.pow(SCREEN_HEIGHT-FARMER_POSY[2],2));
+                } else {
+                    dist[0] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE][FARMER_POSX[2]/UNIT_SIZE + 1] != 0 && farmerDirection[2] != 'L' && (FARMER_POSX[2]/UNIT_SIZE != 21 && FARMER_POSY[2]/UNIT_SIZE != 16)) {
+                    dist[1] = Math.sqrt((Math.pow(SCREEN_WIDTH-(FARMER_POSX[2] + 1),2))+Math.pow(SCREEN_HEIGHT-FARMER_POSY[2],2));
+                } else {
+                    dist[1] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE - 1][FARMER_POSX[2]/UNIT_SIZE] != 0 && farmerDirection[2] != 'D') {
+                    dist[2] = Math.sqrt((Math.pow(SCREEN_WIDTH-FARMER_POSX[2],2))+Math.pow(SCREEN_HEIGHT-(FARMER_POSY[2] - 1),2));
+                } else {
+                    dist[2] = -1;
+                }
+                if (boardMap[FARMER_POSY[2]/UNIT_SIZE + 1][FARMER_POSX[2]/UNIT_SIZE] != 0&& farmerDirection[2] != 'U') {
+                    dist[3] = Math.sqrt((Math.pow(SCREEN_WIDTH-FARMER_POSX[2],2))+Math.pow(SCREEN_HEIGHT-(FARMER_POSY[2] + 1),2));
+                } else {
+                    dist[3] = -1;
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    if ((dist[i] < smallestNum) && (dist[i] != -1)) {
+                        smallestNum = dist[i];
+                        smallestNumIndex = i;
+                    }
+                }
+
+                if (smallestNumIndex == 0) {
+                    farmerDirection[2] = 'L';
+                    FARMER_POSX[2] -= UNIT_SIZE;
+                } else if (smallestNumIndex == 1) {
+                    farmerDirection[2] = 'R';
+                    FARMER_POSX[2] += UNIT_SIZE;
+                } else if (smallestNumIndex == 2) {
+                    farmerDirection[2] = 'U';
+                    FARMER_POSY[2] -= UNIT_SIZE;
+                }
+                if (smallestNumIndex == 3) {
+                    farmerDirection[2] = 'D';
+                    FARMER_POSY[2] += UNIT_SIZE;
+                }
+            }
+        }
     }
 
     /*
     Method: moveFarmer4
-    Description of Farmer: Genius Trickster. Will act like is running but will actually be trying to juke the cow
+    Description of Farmer: If cow within 8 blocks (160 px) then pursue, otherwise make way to top left
     When Make Decision on movement: Intersection of maze points
      */
     public void moveFarmer4() {
-        /*
-        if (!farmersInCage[3]) {
+
+        if (!farmersInCage[3] && System.currentTimeMillis() - start > 3000) {
             leaveCage(4);
         }
-        FARMER SHOULD ONLY BE ALLOWED TO LEAVE CAGE WHEN IT IS THEIR TIME TO!
-         */
-        //come up with smart farmer method
+
+        if (!checkIntersection(FARMER_POSX[3]/UNIT_SIZE, FARMER_POSY[3]/UNIT_SIZE)) {
+            switch (farmerDirection[3]) {
+                case 'U':
+                    if((boardMap[(FARMER_POSY[3] - UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE] != 0))
+                        FARMER_POSY[3] = FARMER_POSY[3] - UNIT_SIZE;
+                    else
+                        farmerDirection[3] = checkNextDirection(farmerDirection[3], 3);
+                    break;
+                case 'D':
+                    if((boardMap[(FARMER_POSY[3] + UNIT_SIZE)/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE] != 0))
+                        FARMER_POSY[3] = FARMER_POSY[3] + UNIT_SIZE;
+                    else
+                        farmerDirection[3] = checkNextDirection(farmerDirection[3], 3);
+                    break;
+                case 'L':
+                    if((boardMap[FARMER_POSY[3]/UNIT_SIZE][(FARMER_POSX[3] - UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[3] = FARMER_POSX[3] - UNIT_SIZE;
+                    else
+                        farmerDirection[3] = checkNextDirection(farmerDirection[3], 3);
+                    break;
+                case 'R':
+                    if((boardMap[FARMER_POSY[3]/UNIT_SIZE][(FARMER_POSX[3] + UNIT_SIZE)/UNIT_SIZE] != 0))
+                        FARMER_POSX[3] = FARMER_POSX[3] + UNIT_SIZE;
+                    else
+                        farmerDirection[3] = checkNextDirection(farmerDirection[3], 3);
+                    break;
+            }
+        } else {
+            if (Math.sqrt((Math.pow(myPosx-FARMER_POSX[3],2))+Math.pow(myPosY-FARMER_POSY[3],2)) < 160) {
+                double dist[] = new double[4];
+                double smallestNum = 5000;
+                int smallestNumIndex = -1;
+
+
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE - 1] != 0 && farmerDirection[3] != 'R' && (FARMER_POSX[3]/UNIT_SIZE != 6 && FARMER_POSY[3]/UNIT_SIZE != 16)) {
+                    dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[3] - 1),2))+Math.pow(myPosY-FARMER_POSY[3],2));
+                } else {
+                    dist[0] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE + 1] != 0 && farmerDirection[3] != 'L' && (FARMER_POSX[3]/UNIT_SIZE != 21 && FARMER_POSY[3]/UNIT_SIZE != 16)) {
+                    dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[3] + 1),2))+Math.pow(myPosY-FARMER_POSY[3],2));
+                } else {
+                    dist[1] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE - 1][FARMER_POSX[3]/UNIT_SIZE] != 0 && farmerDirection[3] != 'D') {
+                    dist[2] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[3],2))+Math.pow(myPosY-(FARMER_POSY[3] - 1),2));
+                } else {
+                    dist[2] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE + 1][FARMER_POSX[3]/UNIT_SIZE] != 0&& farmerDirection[3] != 'U') {
+                    dist[3] = Math.sqrt((Math.pow(myPosx-FARMER_POSX[3],2))+Math.pow(myPosY-(FARMER_POSY[3] + 1),2));
+                } else {
+                    dist[3] = -1;
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    if ((dist[i] < smallestNum) && (dist[i] != -1)) {
+                        smallestNum = dist[i];
+                        smallestNumIndex = i;
+                    }
+                }
+
+                if (smallestNumIndex == 0) {
+                    farmerDirection[3] = 'L';
+                    FARMER_POSX[3] -= UNIT_SIZE;
+                } else if (smallestNumIndex == 1) {
+                    farmerDirection[3] = 'R';
+                    FARMER_POSX[3] += UNIT_SIZE;
+                } else if (smallestNumIndex == 2) {
+                    farmerDirection[3] = 'U';
+                    FARMER_POSY[3] -= UNIT_SIZE;
+                }
+                if (smallestNumIndex == 3) {
+                    farmerDirection[3] = 'D';
+                    FARMER_POSY[3] += UNIT_SIZE;
+                }
+            } else {
+                double dist[] = new double[4];
+                double smallestNum = 5000;
+                int smallestNumIndex = -1;
+
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE - 1] != 0 && farmerDirection[3] != 'R' && (FARMER_POSX[3]/UNIT_SIZE != 6 && FARMER_POSY[3]/UNIT_SIZE != 16)) {
+                    dist[0] = Math.sqrt((Math.pow(-(FARMER_POSX[3] - 1),2))+Math.pow(-FARMER_POSY[3],2));
+                } else {
+                    dist[0] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE][FARMER_POSX[3]/UNIT_SIZE + 1] != 0 && farmerDirection[3] != 'L' && (FARMER_POSX[3]/UNIT_SIZE != 21 && FARMER_POSY[3]/UNIT_SIZE != 16)) {
+                    dist[1] = Math.sqrt((Math.pow(-(FARMER_POSX[3] + 1),2))+Math.pow(-FARMER_POSY[3],2));
+                } else {
+                    dist[1] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE - 1][FARMER_POSX[3]/UNIT_SIZE] != 0 && farmerDirection[3] != 'D') {
+                    dist[2] = Math.sqrt((Math.pow(-FARMER_POSX[3],2))+Math.pow(-(FARMER_POSY[3] - 1),2));
+                } else {
+                    dist[2] = -1;
+                }
+                if (boardMap[FARMER_POSY[3]/UNIT_SIZE + 1][FARMER_POSX[3]/UNIT_SIZE] != 0&& farmerDirection[3] != 'U') {
+                    dist[3] = Math.sqrt((Math.pow(-FARMER_POSX[3],2))+Math.pow(-(FARMER_POSY[3] + 1),2));
+                } else {
+                    dist[3] = -1;
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    if ((dist[i] < smallestNum) && (dist[i] != -1)) {
+                        smallestNum = dist[i];
+                        smallestNumIndex = i;
+                    }
+                }
+
+                if (smallestNumIndex == 0) {
+                    farmerDirection[3] = 'L';
+                    FARMER_POSX[3] -= UNIT_SIZE;
+                } else if (smallestNumIndex == 1) {
+                    farmerDirection[3] = 'R';
+                    FARMER_POSX[3] += UNIT_SIZE;
+                } else if (smallestNumIndex == 2) {
+                    farmerDirection[3] = 'U';
+                    FARMER_POSY[3] -= UNIT_SIZE;
+                }
+                if (smallestNumIndex == 3) {
+                    farmerDirection[3] = 'D';
+                    FARMER_POSY[3] += UNIT_SIZE;
+                }
+            }
+        }
     }
+
+    /*
+    Method: move
+    Purpose: Moves player a direction based on called inputs
+     */
     public void move() {
         switch (direction) {
             case 'U':
@@ -311,13 +719,13 @@ public class GameArea extends JPanel implements ActionListener {
                 break;
             case 'L':
                 if(((myPosx - UNIT_SIZE) / UNIT_SIZE == 3) && (myPosY/UNIT_SIZE == 16) || isTeleporting)
-                    teleport(direction);
+                    teleport();
                 if((myPosx != 0)  && (boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0))
                     myPosx = myPosx - UNIT_SIZE;
                 break;
             case 'R':
                 if (((myPosx + UNIT_SIZE) / UNIT_SIZE == 25) && (myPosY/UNIT_SIZE == 16) || isTeleporting)
-                    teleport(direction);
+                    teleport();
                 if((myPosx != SCREEN_WIDTH - UNIT_SIZE)   && (boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0))
                     myPosx = myPosx + UNIT_SIZE;
                 break;
@@ -325,7 +733,11 @@ public class GameArea extends JPanel implements ActionListener {
         }
     }
 
-    public void teleport(char direction) {
+    /*
+    Method: teleport
+    Purpose: Teleports the player across the board
+     */
+    public void teleport() {
         if (direction == 'L') {
             if (myPosx/UNIT_SIZE != 25) {
                 isTeleporting = true;
@@ -376,7 +788,7 @@ public class GameArea extends JPanel implements ActionListener {
     }
 
     public void gameOver(Graphics g) {
-        long end = System.currentTimeMillis();
+        //long end = System.currentTimeMillis();
         //g.setColor(Color.green);
         //g.setFont(new Font("Ink Free", Font.BOLD, 75));
         //FontMetrics scoreMetrics = getFontMetrics(g.getFont());
@@ -422,22 +834,22 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if((direction != 'R') && (boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] == 1)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] == 1)) {
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if((direction != 'L') && (boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] == 1)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] == 1)) {
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-                    if((direction != 'D') && ((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1))) {
+                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
                         direction = 'U';
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if((direction != 'U') && (boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
+                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
                         direction = 'D';
                     }
                     break;
