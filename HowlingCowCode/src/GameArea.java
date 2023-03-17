@@ -14,8 +14,6 @@ public class GameArea extends JPanel implements ActionListener {
     static final int UNIT_SIZE = 20; //size of square, in pixels (was 25 OG)
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
     static final int DELAY = 175; // > #, slower game
-    final int x[] = new int[GAME_UNITS]; //holds x locations of all cartons
-    final int y[] = new int[GAME_UNITS]; //holds y locations of all cartons
     int boardMap[][] = new int[36][28]; //fill in with values
     final int FARMER_POSX[] = new int[4]; //holds x locations of all farmers
     final int FARMER_POSY[] = new int[4]; //holds y locations of all farmers
@@ -32,11 +30,11 @@ public class GameArea extends JPanel implements ActionListener {
     boolean isPaused = false;
     boolean isTeleporting = false;
     public boolean[] farmersInCage = {false, false, false, false};
+    long totalPauseTime = 0;
 
     GameArea() {
         for (int i = 0; i < 36; i++) {
             for (int j = 0; j < 28; j++) {
-
                 boardMap[i][j] = 0;
             }
         }
@@ -66,6 +64,15 @@ public class GameArea extends JPanel implements ActionListener {
                 FARMER_POSX[j] = UNIT_SIZE * 16;
                 FARMER_POSY[j] = UNIT_SIZE * 18;
             }
+            for (int row = 0; row < 28; row++) {
+                for (int col = 0; col < 36; col++) {
+                    if ((col < 3 || col > 33) || ((row > 10 && row < 17) && col > 15 && col < 19) || (col == 16 && (row < 6 || row > 21))) {
+                        boardMap[col][row] = -1; //if player cannot move there or is a tunnel, illegal area for score
+                    } else {
+                        boardMap[col][row] = 2; //if not wall, 2d array is set to be 1
+                    }
+                }
+            }
         }
 
     }
@@ -87,32 +94,6 @@ public class GameArea extends JPanel implements ActionListener {
             for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
                 g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
                 g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
-            }
-
-            //sets color of each farmer and cow
-            for (int i = 0; i < 5; i++) {
-                switch (i) {
-                    case 0:
-                        g.setColor(Color.GREEN);
-                        g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 1:
-                        g.setColor(Color.RED);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 2:
-                        g.setColor(Color.CYAN);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 3:
-                        g.setColor(Color.ORANGE);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 4:
-                        g.setColor(Color.PINK);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                }
             }
 
             //Wall is drawn on board
@@ -144,8 +125,44 @@ public class GameArea extends JPanel implements ActionListener {
                             (row != 1 && row != 12 && row != 15 && row != 26) && (col == 30 || col == 31)){
                         setWall(row, col, g);
                     } else {
-                        boardMap[col][row] = 1; //if not wall, 2d array is set to be 1
+                        if ((col < 3 || col > 33) || ((row > 10 && row < 17) && col > 15 && col < 19) ||
+                                (((col == 16) || (col < 15 && col > 12) || (col > 16 && col < 20))  && (row < 6 || row > 21))) {
+                            boardMap[col][row] = -1; //if player cannot move there or is a tunnel, illegal area for score
+                        } else {
+                            if (boardMap[col][row] == 2) {
+                                g.setColor(Color.YELLOW);
+                                g.fillRect(row * UNIT_SIZE + 7, col * UNIT_SIZE + 7, 6, 6);
+                            }
+                        }
+
                     }
+                }
+            }
+
+            //sets color of each farmer and cow
+            for (int i = 0; i < 5; i++) {
+
+                switch (i) {
+                    case 0:
+                        g.setColor(Color.GREEN);
+                        g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 1:
+                        g.setColor(Color.RED);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 2:
+                        g.setColor(Color.CYAN);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 3:
+                        g.setColor(Color.ORANGE);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
+                    case 4:
+                        g.setColor(Color.PINK);
+                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
+                        break;
                 }
             }
         }
@@ -255,7 +272,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer1() {
 
-        if (!farmersInCage[0] && System.currentTimeMillis() - start > 2000) {
+        if (!farmersInCage[0] && System.currentTimeMillis() - start > 5000) {
             leaveCage(1);
         }
 
@@ -343,7 +360,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer2() {
 
-        if (!farmersInCage[1] && System.currentTimeMillis() - start > 1500) {
+        if (!farmersInCage[1] && dotsEaten > 15) {
             leaveCage(2);
         }
 
@@ -433,7 +450,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer3() {
 
-        if (!farmersInCage[2] && System.currentTimeMillis() - start > 2500) {
+        if (!farmersInCage[2] && dotsEaten > 30) {
             leaveCage(3);
         }
 
@@ -572,7 +589,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer4() {
 
-        if (!farmersInCage[3] && System.currentTimeMillis() - start > 3000) {
+        if (!farmersInCage[3] && dotsEaten > 50) {
             leaveCage(4);
         }
 
@@ -762,16 +779,10 @@ public class GameArea extends JPanel implements ActionListener {
         }
     }
     public void checkCarton() {
-        /*
-        for (int i=0; i<=x.length; i++) {
-            if ((x[i] == myPosx) && (y[i] == myPosY) && (boardMap[i] != 0)) {
-               //code for collecting a carton
-               //should include the removal of the image
-               //should include an addition to point calculation
-               //should include the changing of board map
-            }
+        if (boardMap[myPosY/UNIT_SIZE][myPosx/UNIT_SIZE] == 2) {
+            boardMap[myPosY/UNIT_SIZE][myPosx/UNIT_SIZE] = 1;
+            dotsEaten++;
         }
-        */
     }
 
     public void checkCollisions() {
@@ -788,17 +799,23 @@ public class GameArea extends JPanel implements ActionListener {
     }
 
     public void gameOver(Graphics g) {
-        //long end = System.currentTimeMillis();
-        //g.setColor(Color.green);
-        //g.setFont(new Font("Ink Free", Font.BOLD, 75));
-        //FontMetrics scoreMetrics = getFontMetrics(g.getFont());
-        //g.drawString("Time: " + (double) (end-|start|) /1000, (SCREEN_WIDTH - scoreMetrics.stringWidth("Time:" + (end+start)))/2, SCREEN_HEIGHT/2 - 100);
+        long end = System.currentTimeMillis();
+        long timeInterval = end - start;
+        long totalGameTime = (timeInterval - totalPauseTime);
+
 
         //Game Over Text
         g.setColor(Color.red);
-        g.setFont(new Font("Ink Free", Font.BOLD, 75));
+        g.setFont(new Font("Ink Free", Font.BOLD, 60));
         FontMetrics metrics = getFontMetrics(g.getFont());
-        g.drawString("Game Over!", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
+        g.drawString("Game Over!", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2 + 100);
+
+        //Final Score Text
+        String string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime/ (double) 100);
+        g.setColor(Color.green);
+        g.setFont(new Font("Ink Free", Font.BOLD, 60));
+        FontMetrics scoreMetrics = getFontMetrics(g.getFont());
+        g.drawString(string, (SCREEN_WIDTH - scoreMetrics.stringWidth(string))/2, SCREEN_HEIGHT/2 - 100);
     }
 
     public void pauseGame() {
@@ -810,7 +827,7 @@ public class GameArea extends JPanel implements ActionListener {
     public void unpauseGame() {
         isPaused = false;
         pauseEnding = System.currentTimeMillis();
-        start = start - (pauseEnding - pauseBeginning);
+        totalPauseTime += pauseEnding - pauseBeginning;
         running = true;
     }
 
@@ -834,22 +851,22 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] == 1)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0)) {
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] == 1)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0)) {
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
+                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
                         direction = 'U';
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] == 1)) {
+                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
                         direction = 'D';
                     }
                     break;
