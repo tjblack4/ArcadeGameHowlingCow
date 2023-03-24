@@ -1,11 +1,8 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 public class GameArea extends JPanel implements ActionListener {
 
@@ -15,54 +12,85 @@ public class GameArea extends JPanel implements ActionListener {
     static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE; // unknown
     static final int DELAY = 175; // > #, slower game
     int boardMap[][] = new int[36][28]; //fill in with values
-    final int FARMER_POSX[] = new int[4]; //holds x locations of all farmers
-    final int FARMER_POSY[] = new int[4]; //holds y locations of all farmers
+    int FARMER_POSX[] = new int[4]; //holds x locations of all farmers
+    int FARMER_POSY[] = new int[4]; //holds y locations of all farmers
     int myPosx = 13*UNIT_SIZE; //holds player x position
     int myPosY = 20*UNIT_SIZE; //holds player y position
     int dotsEaten; //holds # of dots eaten, for score calculation
     char farmerDirection[] = new char[4]; // holds directions of each of the farmers
     char direction = 'R'; // holds direction of the cow
     boolean running = false; // holds value for if game is running
+    boolean inMenu = false;
+    char select;
     Timer timer;
     long pauseBeginning;
+    boolean inDifficultyMenu = false;
     long pauseEnding;
     public long start;
     boolean isPaused = false;
     boolean isTeleporting = false;
+    boolean gameEnded = false;
     public boolean[] farmersInCage = {false, false, false, false};
-    long totalPauseTime = 0;
+    long totalPauseTime;
+    Font customFont;
+    String difficulty = "Medium";
 
     GameArea() {
-        for (int i = 0; i < 36; i++) {
-            for (int j = 0; j < 28; j++) {
-                boardMap[i][j] = 0;
-            }
+        try {
+            customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/fonts/Quinquefive-K7qep.ttf")).deriveFont(10f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (FontFormatException e) {
+            e.printStackTrace();
         }
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setFocusable(true);
         this.addKeyListener(new MyKeyAdapter());
-        start = System.currentTimeMillis();
-        startGame();
+        select = 'P';
+        inMenu = true;
     }
 
     public void startGame() {
+        for (int i = 0; i < 36; i++) {
+            for (int j = 0; j < 28; j++) {
+                boardMap[i][j] = 0;
+            }
+        }
+
+        totalPauseTime = 0;
+        dotsEaten = 0;
+        inMenu = false;
+        inDifficultyMenu = false;
         running = true;
         timer = new Timer(DELAY,this);
         timer.start();
+        myPosx = 13 * UNIT_SIZE;
+        myPosY = 20 * UNIT_SIZE;
+        direction = 'R';
         for (int j = 0; j<4; j++) {
             if (j ==0 ) {
                 FARMER_POSX[j] = UNIT_SIZE * 11;
                 FARMER_POSY[j] = UNIT_SIZE * 16;
+                farmersInCage[j] = false;
+                farmerDirection[j] = 0;
             } else if (j==1) {
                 FARMER_POSX[j] = UNIT_SIZE * 16;
                 FARMER_POSY[j] = UNIT_SIZE * 16;
+                farmersInCage[j] = false;
+                farmerDirection[j] = 0;
             } else if (j==2) {
                 FARMER_POSX[j] = UNIT_SIZE * 11;
                 FARMER_POSY[j] = UNIT_SIZE * 18;
+                farmersInCage[j] = false;
+                farmerDirection[j] = 0;
             } else {
                 FARMER_POSX[j] = UNIT_SIZE * 16;
                 FARMER_POSY[j] = UNIT_SIZE * 18;
+                farmersInCage[j] = false;
+                farmerDirection[j] = 0;
             }
             for (int row = 0; row < 28; row++) {
                 for (int col = 0; col < 36; col++) {
@@ -167,8 +195,128 @@ public class GameArea extends JPanel implements ActionListener {
             }
         }
         else if (isPaused) {
-            //make pause screen code
+            Font pause = customFont.deriveFont(40f);
+            g.setColor(Color.WHITE);
+            g.setFont(pause);
+            FontMetrics titleMetrics = getFontMetrics(g.getFont());
+            g.drawString("Paused", (SCREEN_WIDTH - titleMetrics.stringWidth("Paused"))/2, SCREEN_HEIGHT/2 - 50);
+
+            g.fillRect(SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 10, 10, 60);
+            g.fillRect(SCREEN_WIDTH / 2 + 20, SCREEN_HEIGHT / 2 - 10, 10, 60);
+        } else if (inMenu) {
+                Font title = customFont.deriveFont(40f);
+                g.setColor(Color.BLUE);
+            g.setFont(title);
+            FontMetrics titleMetrics = getFontMetrics(g.getFont());
+            g.drawString("Howling Cow", (SCREEN_WIDTH - titleMetrics.stringWidth("Howling Cow"))/2, SCREEN_HEIGHT/2 - 200);
+
+            Font menuOption1 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(menuOption1);
+            FontMetrics option1Metrics = getFontMetrics(g.getFont());
+            g.drawString("Play Game", (SCREEN_WIDTH - option1Metrics.stringWidth("Play Game"))/2, SCREEN_HEIGHT/2 - 80);
+
+            Font menuOption2 = customFont.deriveFont(16f);
+            g.setColor(Color.BLUE);
+            g.setFont(menuOption2);
+            FontMetrics option2Metrics = getFontMetrics(g.getFont());
+            g.drawString("Difficulty Settings", (SCREEN_WIDTH - option2Metrics.stringWidth("Difficulty Settings"))/2, SCREEN_HEIGHT/2 + 30);
+
+            Font menuOption3 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(menuOption3);
+            FontMetrics option3Metrics = getFontMetrics(g.getFont());
+            g.drawString("Quit Game", (SCREEN_WIDTH - option3Metrics.stringWidth("Quit Game"))/2, SCREEN_HEIGHT/2 + 140);
+            switch (select) {
+                case 'P':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - option1Metrics.stringWidth("Play Game")/2 - 50, SCREEN_HEIGHT/2 - 90, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - option1Metrics.stringWidth("Play Game")/2 - 50, SCREEN_HEIGHT/2 - 90, 10, 10, 0,360);
+                    break;
+                case 'D':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - option2Metrics.stringWidth("Play Game")/2 + 9, SCREEN_HEIGHT/2 + 20, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - option2Metrics.stringWidth("Play Game")/2 + 9, SCREEN_HEIGHT/2 + 20, 10, 10, 0,360);
+                    break;
+                case 'Q':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - option3Metrics.stringWidth("Quit Game")/2 - 50, SCREEN_HEIGHT/2 + 130, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - option3Metrics.stringWidth("Quit Game")/2 - 50, SCREEN_HEIGHT/2 + 130, 10, 10, 0,360);
+                    break;
+            }
+        } else if (inDifficultyMenu) {
+            Font difficultyMenuTitle = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(difficultyMenuTitle);
+            FontMetrics difficultyMenuTitleMetrics = getFontMetrics(g.getFont());
+            g.drawString("Difficulty Settings", (SCREEN_WIDTH - difficultyMenuTitleMetrics.stringWidth("Difficulty Settings"))/2, SCREEN_HEIGHT/2 - 200);
+
+            Font difficultyMenuOption1 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(difficultyMenuOption1);
+            FontMetrics difficultyMenuOption1Metrics = getFontMetrics(g.getFont());
+            g.drawString("Easy", (SCREEN_WIDTH - difficultyMenuOption1Metrics.stringWidth("Easy"))/2, SCREEN_HEIGHT/2 - 80);
+
+            Font difficultyMenuOption2 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(difficultyMenuOption2);
+            FontMetrics difficultyMenuOption2Metrics = getFontMetrics(g.getFont());
+            g.drawString("Medium", (SCREEN_WIDTH - difficultyMenuOption2Metrics.stringWidth("Medium"))/2, SCREEN_HEIGHT/2 + 30);
+
+            Font difficultyMenuOption3 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(difficultyMenuOption3);
+            FontMetrics difficultyMenuOption3Metrics = getFontMetrics(g.getFont());
+            g.drawString("Difficult", (SCREEN_WIDTH - difficultyMenuOption3Metrics.stringWidth("Difficult"))/2, SCREEN_HEIGHT/2 + 140);
+
+            Font difficultyMenuOption4 = customFont.deriveFont(20f);
+            g.setColor(Color.BLUE);
+            g.setFont(difficultyMenuOption4);
+            FontMetrics difficultyMenuOption4Metrics = getFontMetrics(g.getFont());
+            g.drawString("Back", (SCREEN_WIDTH - difficultyMenuOption4Metrics.stringWidth("Back"))/2, SCREEN_HEIGHT/2 + 250);
+
+            switch (difficulty) {
+                case "Easy":
+                    g.setColor(Color.WHITE);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption1Metrics.stringWidth("Easy")/2 - 350, SCREEN_HEIGHT/2 - 90, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption1Metrics.stringWidth("Easy")/2 - 350, SCREEN_HEIGHT/2 - 90, 10, 10, 0,360);
+                    break;
+                case "Medium":
+                    g.setColor(Color.WHITE);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption2Metrics.stringWidth("Medium")/2 - 350, SCREEN_HEIGHT/2 + 20, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption2Metrics.stringWidth("Medium")/2 - 350, SCREEN_HEIGHT/2 + 20, 10, 10, 0,360);
+                    break;
+                case "Difficult":
+                    g.setColor(Color.WHITE);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption3Metrics.stringWidth("Difficult")/2 - 350, SCREEN_HEIGHT/2 + 130, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption3Metrics.stringWidth("Difficult")/2 - 350, SCREEN_HEIGHT/2 + 130, 10, 10, 0,360);
+                    break;
+            }
+
+            switch (select) {
+                case 'E':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption1Metrics.stringWidth("Easy")/2 - 150, SCREEN_HEIGHT/2 - 90, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption1Metrics.stringWidth("Easy")/2 - 150, SCREEN_HEIGHT/2 - 90, 10, 10, 0,360);
+                    break;
+                case 'M':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption2Metrics.stringWidth("Medium")/2 - 120, SCREEN_HEIGHT/2 + 20, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption2Metrics.stringWidth("Medium")/2 - 120, SCREEN_HEIGHT/2 + 20, 10, 10, 0,360);
+                    break;
+                case 'H':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption3Metrics.stringWidth("Difficult")/2 - 50, SCREEN_HEIGHT/2 + 130, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption3Metrics.stringWidth("Difficult")/2 - 50, SCREEN_HEIGHT/2 + 130, 10, 10, 0,360);
+                    break;
+                case 'B':
+                    g.setColor(Color.YELLOW);
+                    g.drawOval(SCREEN_WIDTH - difficultyMenuOption4Metrics.stringWidth("Back")/2 - 150, SCREEN_HEIGHT/2 + 240, 10, 10);
+                    g.fillArc(SCREEN_WIDTH - difficultyMenuOption4Metrics.stringWidth("Back")/2 - 150, SCREEN_HEIGHT/2 + 240, 10, 10, 0,360);
+                    break;
+            }
         } else {
+            gameEnded = true;
             gameOver(g); //if not paused or running, game is over
         }
     }
@@ -272,9 +420,10 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer1() {
 
-        if (!farmersInCage[0] && System.currentTimeMillis() - start > 5000) {
+        if (!farmersInCage[0] && System.currentTimeMillis() - start > 5000 && !difficulty.equals("Easy")) {
             leaveCage(1);
         }
+
 
         if (!checkIntersection(FARMER_POSX[0]/UNIT_SIZE, FARMER_POSY[0]/UNIT_SIZE)) {
             switch (farmerDirection[0]) {
@@ -310,12 +459,12 @@ public class GameArea extends JPanel implements ActionListener {
 
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE - 1] != 0 && farmerDirection[0] != 'R' && (FARMER_POSX[0]/UNIT_SIZE != 6 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
                 dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] - 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
-            } else {
+            }  else {
                 dist[0] = -1;
             }
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE + 1] != 0 && farmerDirection[0] != 'L' && (FARMER_POSX[0]/UNIT_SIZE != 21 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
                 dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] + 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
-            } else {
+            }  else {
                 dist[1] = -1;
             }
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE - 1][FARMER_POSX[0]/UNIT_SIZE] != 0 && farmerDirection[0] != 'D') {
@@ -399,7 +548,7 @@ public class GameArea extends JPanel implements ActionListener {
 
             if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE - 1] != 0 && farmerDirection[1] != 'R' && (FARMER_POSX[1]/UNIT_SIZE != 6 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
                 dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[1] - 1),2))+Math.pow(myPosY-FARMER_POSY[1],2));
-            } else {
+            }  else {
                 dist[0] = -1;
             }
             if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE + 1] != 0 && farmerDirection[1] != 'L' && (FARMER_POSX[1]/UNIT_SIZE != 21 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
@@ -450,7 +599,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer3() {
 
-        if (!farmersInCage[2] && dotsEaten > 30) {
+        if (!farmersInCage[2] && dotsEaten > 30 && !difficulty.equals("Easy")) {
             leaveCage(3);
         }
 
@@ -783,6 +932,9 @@ public class GameArea extends JPanel implements ActionListener {
             boardMap[myPosY/UNIT_SIZE][myPosx/UNIT_SIZE] = 1;
             dotsEaten++;
         }
+        if (dotsEaten == 296) {
+            running = false;
+        }
     }
 
     public void checkCollisions() {
@@ -798,24 +950,31 @@ public class GameArea extends JPanel implements ActionListener {
         }
     }
 
-    public void gameOver(Graphics g) {
+    public void gameOver(Graphics g)  {
         long end = System.currentTimeMillis();
         long timeInterval = end - start;
         long totalGameTime = (timeInterval - totalPauseTime);
 
-
         //Game Over Text
+        Font gameOverText = customFont.deriveFont(30f);
         g.setColor(Color.red);
-        g.setFont(new Font("Ink Free", Font.BOLD, 60));
+        g.setFont(gameOverText);
         FontMetrics metrics = getFontMetrics(g.getFont());
         g.drawString("Game Over!", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2 + 100);
 
         //Final Score Text
-        String string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime/ (double) 100);
-        g.setColor(Color.green);
-        g.setFont(new Font("Ink Free", Font.BOLD, 60));
+        String string;
+        if (dotsEaten == 296) {
+            string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime / (double) 100 + 5000);
+        } else {
+            string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime/ (double) 100);
+        }
+        Font scoreText = customFont.deriveFont(16f);
+        g.setColor(Color.yellow);
+        g.setFont(scoreText);
         FontMetrics scoreMetrics = getFontMetrics(g.getFont());
         g.drawString(string, (SCREEN_WIDTH - scoreMetrics.stringWidth(string))/2, SCREEN_HEIGHT/2 - 100);
+
     }
 
     public void pauseGame() {
@@ -851,30 +1010,137 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && !difficulty.equals("Difficult")) {
+                        direction = 'L';
+                    } else if ((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && difficulty.equals("Difficult") && direction != 'R') {
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0)) {
+                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && !difficulty.equals("Difficult")) {
+                        direction = 'R';
+                    } else if ((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && difficulty.equals("Difficult") && direction != 'L') {
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
+                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0) && running && !difficulty.equals("Difficult")) {
                         direction = 'U';
+                    } else if ((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][(myPosx)/UNIT_SIZE] != 0)  && running &&difficulty.equals("Difficult") && direction != 'D') {
+                        direction = 'U';
+                    } else if (!running && !isPaused && inMenu) {
+                        switch (select) {
+                            case 'P':
+                                break;
+                            case 'D':
+                                select = 'P';
+                                repaint();
+                                break;
+                            case 'Q':
+                                select = 'D';
+                                repaint();
+                                break;
+                        }
+                    } else if (!running && !isPaused && inDifficultyMenu) {
+                        switch (select) {
+                            case 'E':
+                                break;
+                            case 'M':
+                                select = 'E';
+                                repaint();
+                                break;
+                            case 'H':
+                                select = 'M';
+                                repaint();
+                                break;
+                            case 'B':
+                                select = 'H';
+                                repaint();
+                                break;
+                        }
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
+                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0) && running && !difficulty.equals("Difficult")) {
                         direction = 'D';
+                    } else if ((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][(myPosx)/UNIT_SIZE] != 0) && running && difficulty.equals("Difficult") && direction != 'U') {
+                        direction = 'D';
+                    } else if (!running && !isPaused && inMenu) {
+                        switch (select) {
+                            case 'P':
+                                select = 'D';
+                                repaint();
+                                break;
+                            case 'D':
+                                select = 'Q';
+                                repaint();
+                                break;
+                            case 'Q':
+                                break;
+                        }
+                    } else if (!running && !isPaused && inDifficultyMenu) {
+                        switch (select) {
+                            case 'E':
+                                select = 'M';
+                                repaint();
+                                break;
+                            case 'M':
+                                select = 'H';
+                                repaint();
+                                break;
+                            case 'H':
+                                select = 'B';
+                                repaint();
+                                break;
+                            case 'B':
+                                break;
+                        }
                     }
                     break;
                 case KeyEvent.VK_1:
-                    if(!isPaused)
+                    if(!isPaused && start != 0)
                         pauseGame();
-                    else
+                    else if (isPaused)
                         unpauseGame();
+                    break;
+                case KeyEvent.VK_2:
+                    if((running && !inMenu && !isTeleporting) || gameEnded) {
+                        timer.stop();
+                        running = false;
+                        inMenu = true;
+                        repaint();
+                    }
+                    break;
+                case KeyEvent.VK_3:
+                    if(!running && inMenu) {
+                        if (select == 'P') {
+                            start = System.currentTimeMillis();
+                            startGame();
+                        } else if (select == 'D') {
+                            select = 'E';
+                            inMenu = false;
+                            inDifficultyMenu = true;
+                            repaint();
+                        } else {
+                            System.exit(0);
+                        }
+                    } else if (!running && inDifficultyMenu) {
+                        if (select == 'E') {
+                            difficulty = "Easy";
+                            repaint();
+                        } else if (select == 'M') {
+                            difficulty = "Medium";
+                            repaint();
+                        } else if (select == 'H') {
+                            difficulty = "Difficult";
+                            repaint();
+                        } else if (select == 'B') {
+                            select = 'P';
+                            inDifficultyMenu = false;
+                            inMenu = true;
+                            repaint();
+                        }
+                    }
                     break;
             }
         }
