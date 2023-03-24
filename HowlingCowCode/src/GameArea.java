@@ -31,7 +31,6 @@ public class GameArea extends JPanel implements ActionListener {
     boolean isTeleporting = false;
     boolean gameEnded = false;
     public boolean[] farmersInCage = {false, false, false, false};
-<<<<<<< HEAD
     long totalPauseTime;
     Font customFont;
     String difficulty = "Medium";
@@ -45,15 +44,6 @@ public class GameArea extends JPanel implements ActionListener {
             e.printStackTrace();
         } catch (FontFormatException e) {
             e.printStackTrace();
-=======
-    long totalPauseTime = 0;
-
-    GameArea() {
-        for (int i = 0; i < 36; i++) {
-            for (int j = 0; j < 28; j++) {
-                boardMap[i][j] = 0;
-            }
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
         }
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -101,15 +91,6 @@ public class GameArea extends JPanel implements ActionListener {
                 FARMER_POSY[j] = UNIT_SIZE * 18;
                 farmersInCage[j] = false;
                 farmerDirection[j] = 0;
-            }
-            for (int row = 0; row < 28; row++) {
-                for (int col = 0; col < 36; col++) {
-                    if ((col < 3 || col > 33) || ((row > 10 && row < 17) && col > 15 && col < 19) || (col == 16 && (row < 6 || row > 21))) {
-                        boardMap[col][row] = -1; //if player cannot move there or is a tunnel, illegal area for score
-                    } else {
-                        boardMap[col][row] = 2; //if not wall, 2d array is set to be 1
-                    }
-                }
             }
             for (int row = 0; row < 28; row++) {
                 for (int col = 0; col < 36; col++) {
@@ -214,7 +195,6 @@ public class GameArea extends JPanel implements ActionListener {
             }
         }
         else if (isPaused) {
-<<<<<<< HEAD
             Font pause = customFont.deriveFont(40f);
             g.setColor(Color.WHITE);
             g.setFont(pause);
@@ -337,10 +317,6 @@ public class GameArea extends JPanel implements ActionListener {
             }
         } else {
             gameEnded = true;
-=======
-            //make pause screen code
-        } else {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
             gameOver(g); //if not paused or running, game is over
         }
     }
@@ -444,18 +420,11 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer1() {
 
-<<<<<<< HEAD
         if (!farmersInCage[0] && System.currentTimeMillis() - start > 5000 && !difficulty.equals("Easy")) {
             leaveCage(1);
         }
 
 
-=======
-        if (!farmersInCage[0] && System.currentTimeMillis() - start > 5000) {
-            leaveCage(1);
-        }
-
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
         if (!checkIntersection(FARMER_POSX[0]/UNIT_SIZE, FARMER_POSY[0]/UNIT_SIZE)) {
             switch (farmerDirection[0]) {
                 case 'U':
@@ -490,20 +459,12 @@ public class GameArea extends JPanel implements ActionListener {
 
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE - 1] != 0 && farmerDirection[0] != 'R' && (FARMER_POSX[0]/UNIT_SIZE != 6 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
                 dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] - 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
-<<<<<<< HEAD
             }  else {
-=======
-            } else {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                 dist[0] = -1;
             }
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE][FARMER_POSX[0]/UNIT_SIZE + 1] != 0 && farmerDirection[0] != 'L' && (FARMER_POSX[0]/UNIT_SIZE != 21 && FARMER_POSY[0]/UNIT_SIZE != 16)) {
                 dist[1] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[0] + 1),2))+Math.pow(myPosY-FARMER_POSY[0],2));
-<<<<<<< HEAD
             }  else {
-=======
-            } else {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                 dist[1] = -1;
             }
             if (boardMap[FARMER_POSY[0]/UNIT_SIZE - 1][FARMER_POSX[0]/UNIT_SIZE] != 0 && farmerDirection[0] != 'D') {
@@ -587,11 +548,7 @@ public class GameArea extends JPanel implements ActionListener {
 
             if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE - 1] != 0 && farmerDirection[1] != 'R' && (FARMER_POSX[1]/UNIT_SIZE != 6 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
                 dist[0] = Math.sqrt((Math.pow(myPosx-(FARMER_POSX[1] - 1),2))+Math.pow(myPosY-FARMER_POSY[1],2));
-<<<<<<< HEAD
             }  else {
-=======
-            } else {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                 dist[0] = -1;
             }
             if (boardMap[FARMER_POSY[1]/UNIT_SIZE][FARMER_POSX[1]/UNIT_SIZE + 1] != 0 && farmerDirection[1] != 'L' && (FARMER_POSX[1]/UNIT_SIZE != 21 && FARMER_POSY[1]/UNIT_SIZE != 16)) {
@@ -642,11 +599,7 @@ public class GameArea extends JPanel implements ActionListener {
      */
     public void moveFarmer3() {
 
-<<<<<<< HEAD
         if (!farmersInCage[2] && dotsEaten > 30 && !difficulty.equals("Easy")) {
-=======
-        if (!farmersInCage[2] && dotsEaten > 30) {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
             leaveCage(3);
         }
 
@@ -978,12 +931,9 @@ public class GameArea extends JPanel implements ActionListener {
         if (boardMap[myPosY/UNIT_SIZE][myPosx/UNIT_SIZE] == 2) {
             boardMap[myPosY/UNIT_SIZE][myPosx/UNIT_SIZE] = 1;
             dotsEaten++;
-<<<<<<< HEAD
         }
         if (dotsEaten == 296) {
             running = false;
-=======
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
         }
     }
 
@@ -1004,24 +954,15 @@ public class GameArea extends JPanel implements ActionListener {
         long end = System.currentTimeMillis();
         long timeInterval = end - start;
         long totalGameTime = (timeInterval - totalPauseTime);
-<<<<<<< HEAD
-=======
-
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
 
         //Game Over Text
         Font gameOverText = customFont.deriveFont(30f);
         g.setColor(Color.red);
-<<<<<<< HEAD
         g.setFont(gameOverText);
-=======
-        g.setFont(new Font("Ink Free", Font.BOLD, 60));
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
         FontMetrics metrics = getFontMetrics(g.getFont());
         g.drawString("Game Over!", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2 + 100);
 
         //Final Score Text
-<<<<<<< HEAD
         String string;
         if (dotsEaten == 296) {
             string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime / (double) 100 + 5000);
@@ -1034,13 +975,6 @@ public class GameArea extends JPanel implements ActionListener {
         FontMetrics scoreMetrics = getFontMetrics(g.getFont());
         g.drawString(string, (SCREEN_WIDTH - scoreMetrics.stringWidth(string))/2, SCREEN_HEIGHT/2 - 100);
 
-=======
-        String string = "Final Score: " + Math.round(dotsEaten*10 + totalGameTime/ (double) 100);
-        g.setColor(Color.green);
-        g.setFont(new Font("Ink Free", Font.BOLD, 60));
-        FontMetrics scoreMetrics = getFontMetrics(g.getFont());
-        g.drawString(string, (SCREEN_WIDTH - scoreMetrics.stringWidth(string))/2, SCREEN_HEIGHT/2 - 100);
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
     }
 
     public void pauseGame() {
@@ -1076,33 +1010,21 @@ public class GameArea extends JPanel implements ActionListener {
         public void keyPressed (KeyEvent e) {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-<<<<<<< HEAD
                     if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && !difficulty.equals("Difficult")) {
                         direction = 'L';
                     } else if ((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && difficulty.equals("Difficult") && direction != 'R') {
-=======
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx-UNIT_SIZE)/UNIT_SIZE] != 0)) {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                         direction = 'L';
                     }
                     break;
                 case KeyEvent.VK_RIGHT:
-<<<<<<< HEAD
                     if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && !difficulty.equals("Difficult")) {
                         direction = 'R';
                     } else if ((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0) && !isTeleporting && running && difficulty.equals("Difficult") && direction != 'L') {
-=======
-                    if((boardMap[myPosY/UNIT_SIZE][(myPosx+UNIT_SIZE)/UNIT_SIZE] != 0)) {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                         direction = 'R';
                     }
                     break;
                 case KeyEvent.VK_UP:
-<<<<<<< HEAD
                     if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0) && running && !difficulty.equals("Difficult")) {
-=======
-                    if((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                         direction = 'U';
                     } else if ((boardMap[(myPosY-UNIT_SIZE)/UNIT_SIZE][(myPosx)/UNIT_SIZE] != 0)  && running &&difficulty.equals("Difficult") && direction != 'D') {
                         direction = 'U';
@@ -1139,11 +1061,7 @@ public class GameArea extends JPanel implements ActionListener {
                     }
                     break;
                 case KeyEvent.VK_DOWN:
-<<<<<<< HEAD
                     if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0) && running && !difficulty.equals("Difficult")) {
-=======
-                    if((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][myPosx/UNIT_SIZE] != 0)) {
->>>>>>> ab0bb270057b3b3be89764bc87dbaf1b9acd4f85
                         direction = 'D';
                     } else if ((boardMap[(myPosY+UNIT_SIZE)/UNIT_SIZE][(myPosx)/UNIT_SIZE] != 0) && running && difficulty.equals("Difficult") && direction != 'U') {
                         direction = 'D';
