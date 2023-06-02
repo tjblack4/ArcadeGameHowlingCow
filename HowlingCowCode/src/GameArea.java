@@ -1,8 +1,15 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import com.sun.glass.ui.Window.Level;
+import com.sun.istack.internal.logging.Logger;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class GameArea extends JPanel implements ActionListener {
 
@@ -37,14 +44,17 @@ public class GameArea extends JPanel implements ActionListener {
 
     GameArea() {
         try {
-            customFont = Font.createFont(Font.TRUETYPE_FONT, new File("src/fonts/Quinquefive-K7qep.ttf")).deriveFont(10f);
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(customFont);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (FontFormatException e) {
-            e.printStackTrace();
+        	java.io.InputStream inputStream = getClass().getResourceAsStream("/fonts/Quinquefive-K7qep.ttf");
+        	customFont = Font.createFont(Font.PLAIN, inputStream);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	System.out.println(e);
         }
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	int width = (int) screenSize.getWidth();
+    	int height = (int) screenSize.getHeight();
+    	
+        this.setBounds(width / 2 - 280, height / 2 - 360, 560, 720);
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setFocusable(true);
@@ -54,12 +64,13 @@ public class GameArea extends JPanel implements ActionListener {
     }
 
     public void startGame() {
+    	
         for (int i = 0; i < 36; i++) {
             for (int j = 0; j < 28; j++) {
                 boardMap[i][j] = 0;
             }
         }
-
+		
         totalPauseTime = 0;
         dotsEaten = 0;
         inMenu = false;
@@ -119,11 +130,12 @@ public class GameArea extends JPanel implements ActionListener {
 
         if (running) {
             //creates grid pattern of game screen
+        	/*
             for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
                 g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
                 g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
-
+			*/
             //Wall is drawn on board
             for (int row = 0; row < 28; row++) {
                 for (int col = 0; col < 36; col++) {
@@ -169,29 +181,7 @@ public class GameArea extends JPanel implements ActionListener {
 
             //sets color of each farmer and cow
             for (int i = 0; i < 5; i++) {
-
-                switch (i) {
-                    case 0:
-                        g.setColor(Color.GREEN);
-                        g.fillRect(myPosx, myPosY, UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 1:
-                        g.setColor(Color.RED);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 2:
-                        g.setColor(Color.CYAN);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 3:
-                        g.setColor(Color.ORANGE);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                    case 4:
-                        g.setColor(Color.PINK);
-                        g.fillRect(FARMER_POSX[i - 1], FARMER_POSY[i - 1], UNIT_SIZE, UNIT_SIZE);
-                        break;
-                }
+                drawImage(i, g);
             }
         }
         else if (isPaused) {
@@ -1003,6 +993,37 @@ public class GameArea extends JPanel implements ActionListener {
             checkCollisions();
         }
         repaint();
+    }
+    
+    public void drawImage(int index, Graphics g) {
+        try {
+            switch (index) {
+                case 0:
+                    URL cow = getClass().getResource("/images/Sprite_Cow.png");
+                    g.drawImage(ImageIO.read(cow), myPosx, myPosY, this);
+                    break;
+                case 1:
+                    URL farmer1 = getClass().getResource("/images/Farmer_Sprite.png");
+                    g.drawImage(ImageIO.read(farmer1), FARMER_POSX[index-1], FARMER_POSY[index-1], this);
+                    break;
+                case 2:
+                    URL farmer2 = getClass().getResource("/images/Farmer_Sprite(1).png");
+                    g.drawImage(ImageIO.read(farmer2), FARMER_POSX[index-1], FARMER_POSY[index-1], this);
+                    break;
+                case 3:
+                	URL farmer3 = getClass().getResource("/images/Farmer_Sprite(2).png");
+                    g.drawImage(ImageIO.read(farmer3), FARMER_POSX[index-1], FARMER_POSY[index-1], this);
+                    break;
+                case 4:
+                	URL farmer4 = getClass().getResource("/images/Farmer_Sprite(3).png");
+                    g.drawImage(ImageIO.read(farmer4), FARMER_POSX[index-1], FARMER_POSY[index-1], this);
+                    break;
+            }
+        } catch (MalformedURLException ex) {
+            
+        } catch (IOException ex) {
+            
+        }
     }
 
     public class MyKeyAdapter extends KeyAdapter {
